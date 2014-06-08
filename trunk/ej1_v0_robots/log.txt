@@ -1,0 +1,78 @@
+[37m07:41:20 [LANZADOR]: PROCESO INICIADO[0m
+[37m07:41:20 [LANZADOR]: Shared Memory creada exitosamente con id 300[0m
+[37m07:41:20 [LANZADOR]: Shared Memory 300 attacheada exitosamente[0m
+[37m07:41:20 [LANZADOR]: Semaforo 200 creado exitosamente con clave -938598580[0m
+[37m07:41:20 [LANZADOR]: Semaforo 400 creado exitosamente con clave -1878122676[0m
+[37m07:41:20 [LANZADOR]: Semaforo 800 creado exitosamente con clave 537796428[0m
+[37m07:41:20 [LANZADOR]: Semaforo 401 creado exitosamente con clave -1861345460[0m
+[37m07:41:20 [LANZADOR]: Semaforo 801 creado exitosamente con clave 554573644[0m
+[37m07:41:20 [LANZADOR]: Semaforo 402 creado exitosamente con clave -1844568244[0m
+[37m07:41:20 [LANZADOR]: Semaforo 802 creado exitosamente con clave 571350860[0m
+[37m07:41:20 [LANZADOR]: Semaforo 403 creado exitosamente con clave -1827791028[0m
+[37m07:41:20 [LANZADOR]: Semaforo 803 creado exitosamente con clave 588128076[0m
+[37m07:41:20 [LANZADOR]: Cola 655361 creada exitosamente[0m
+[36m07:41:20 [robot_despacho2]: PROCESO INICIADO[0m
+[36m07:41:20 [robot_despacho2]: Esperando frecuencia de activacion...[0m
+[36m07:41:20 [robot_despacho2]: Esperando respuesta a PEDIDO_A_PLATAFORMA - PEDIDO_DETECTAR_FRECUENCIA...[0m
+[35m07:41:21 [robot_armado2]: PROCESO INICIADO[0m
+[35m07:41:21 [robot_armado2]: Preguntando si plataforma llena[0m
+[35m07:41:21 [robot_armado2]: Esperando respuesta a PEDIDO_A_PLATAFORMA - PREGUNTA_PLATAFORMA_LLENA...[0m
+[36m07:41:21 [robot_despacho1]: PROCESO INICIADO[0m
+[36m07:41:21 [robot_despacho1]: Esperando frecuencia de activacion...[0m
+[36m07:41:21 [robot_despacho1]: Esperando respuesta a PEDIDO_A_PLATAFORMA - PEDIDO_DETECTAR_FRECUENCIA...[0m
+[35m07:41:21 [robot_armado1]: PROCESO INICIADO[0m
+[35m07:41:21 [robot_armado1]: Preguntando si plataforma llena[0m
+[35m07:41:21 [robot_armado1]: Esperando respuesta a PEDIDO_A_PLATAFORMA - PREGUNTA_PLATAFORMA_LLENA...[0m
+[33m07:41:21 [control_plataforma4]: PROCESO INICIADO[0m
+[33m07:41:21 [control_plataforma4]: Robot 2 detectando frecuencia[0m
+[33m07:41:21 [control_plataforma4]: Mensaje PREGUNTA_PLATAFORMA_LLENA recibido, procesando...[0m
+P sobre -938598580
+[33m07:41:21 [control_plataforma4]: Posicion 0 reservada por robot 2, espacios ocupados/reservados: 1/15[0m
+[35m07:41:21 [robot_armado2]: Lugar disponible, esperando que robot no este despachando...[0m
+[35m07:41:21 [robot_armado2]: Esperando respuesta a PEDIDO_A_PLATAFORMA - INICIAR_ARMADO...[0m
+V sobre -938598580
+[33m07:41:21 [control_plataforma4]: Robot 1 detectando frecuencia[0m
+[33m07:41:21 [control_plataforma4]: Mensaje PREGUNTA_PLATAFORMA_LLENA recibido, procesando...[0m
+P sobre -938598580
+[33m07:41:21 [control_plataforma4]: Posicion 1 reservada por robot 1, espacios ocupados/reservados: 2/15[0m
+[35m07:41:21 [robot_armado1]: Lugar disponible, esperando que robot no este despachando...[0m
+[35m07:41:21 [robot_armado1]: Esperando respuesta a PEDIDO_A_PLATAFORMA - INICIAR_ARMADO...[0m
+V sobre -938598580
+[33m07:41:21 [control_plataforma4]: Mensaje INICIAR_ARMADO recibido, esperando que robot despacho 2 este libre...[0m
+[33m07:41:21 [control_plataforma4]: No hubo segfault[0m
+[33m07:41:21 [control_plataforma3]: PROCESO INICIADO[0m
+[33m07:41:21 [control_plataforma3]: Mensaje INICIAR_ARMADO recibido, esperando que robot despacho 1 este libre...[0m
+[33m07:41:21 [control_plataforma3]: No hubo segfault[0m
+[33m07:41:21 [control_plataforma2]: PROCESO INICIADO[0m
+[33m07:41:21 [control_plataforma1]: PROCESO INICIADO[0m
+[35m07:41:21 [robot_armado3]: PROCESO INICIADO[0m
+[35m07:41:21 [robot_armado3]: Preguntando si plataforma llena[0m
+[35m07:41:21 [robot_armado3]: Esperando respuesta a PEDIDO_A_PLATAFORMA - PREGUNTA_PLATAFORMA_LLENA...[0m
+[33m07:41:21 [control_plataforma2]: Mensaje PREGUNTA_PLATAFORMA_LLENA recibido, procesando...[0m
+P sobre -938598580
+[33m07:41:21 [control_plataforma2]: Posicion 2 reservada por robot 3, espacios ocupados/reservados: 3/15[0m
+[35m07:41:21 [robot_armado3]: Lugar disponible, esperando que robot no este despachando...[0m
+[35m07:41:21 [robot_armado3]: Esperando respuesta a PEDIDO_A_PLATAFORMA - INICIAR_ARMADO...[0m
+V sobre -938598580
+[33m07:41:21 [control_plataforma1]: Mensaje INICIAR_ARMADO recibido, esperando que robot despacho 3 este libre...[0m
+[33m07:41:21 [control_plataforma1]: No hubo segfault[0m
+[37m07:41:21 [LANZADOR]: PROCESO FINALIZADO[0m
+[36m07:41:21 [robot_despacho4]: PROCESO INICIADO[0m
+[36m07:41:21 [robot_despacho4]: Esperando frecuencia de activacion...[0m
+[36m07:41:21 [robot_despacho4]: Esperando respuesta a PEDIDO_A_PLATAFORMA - PEDIDO_DETECTAR_FRECUENCIA...[0m
+[35m07:41:21 [robot_armado4]: PROCESO INICIADO[0m
+[35m07:41:21 [robot_armado4]: Preguntando si plataforma llena[0m
+[35m07:41:21 [robot_armado4]: Esperando respuesta a PEDIDO_A_PLATAFORMA - PREGUNTA_PLATAFORMA_LLENA...[0m
+[36m07:41:21 [robot_despacho3]: PROCESO INICIADO[0m
+[36m07:41:21 [robot_despacho3]: Esperando frecuencia de activacion...[0m
+[36m07:41:21 [robot_despacho3]: Esperando respuesta a PEDIDO_A_PLATAFORMA - PEDIDO_DETECTAR_FRECUENCIA...[0m
+[33m07:41:21 [control_plataforma2]: Robot 4 detectando frecuencia[0m
+[33m07:41:21 [control_plataforma2]: Mensaje PREGUNTA_PLATAFORMA_LLENA recibido, procesando...[0m
+P sobre -938598580
+[33m07:41:21 [control_plataforma2]: Posicion 3 reservada por robot 4, espacios ocupados/reservados: 4/15[0m
+[35m07:41:21 [robot_armado4]: Lugar disponible, esperando que robot no este despachando...[0m
+[35m07:41:21 [robot_armado4]: Esperando respuesta a PEDIDO_A_PLATAFORMA - INICIAR_ARMADO...[0m
+V sobre -938598580
+[33m07:41:21 [control_plataforma2]: Robot 3 detectando frecuencia[0m
+[33m07:41:21 [control_plataforma2]: Mensaje INICIAR_ARMADO recibido, esperando que robot despacho 4 este libre...[0m
+[33m07:41:21 [control_plataforma2]: No hubo segfault[0m
