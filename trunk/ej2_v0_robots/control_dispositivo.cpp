@@ -2,6 +2,8 @@
 #include "core.h"
 #include "configuracion.h"
 #include "mensaje_debug.h"
+#include <memory>
+
 /*#include "random.h"
 #include "t_sem.h"
 #include <sys/shm.h>
@@ -16,7 +18,8 @@ using std::string;
 
 void ValidarArgumentos( int argc, char** argv ){
       if( argc < 2 ){
-            MensajeError( Robots2::Constantes::NOMBRE_PROCESO_DISPOSITIVO, "Faltan parametros. Uso: %s <numDisp>", argv[0] );
+            MensajeError( Robots2::Constantes::NOMBRE_PROCESO_DISPOSITIVO,
+                          "Faltan parametros. Uso: %s <numDisp>", argv[0] );
             exit(-1);
       }
 }
@@ -33,15 +36,15 @@ int main( int argc, char** argv ){
           MENSAJE_DEBUG("PROCESO FINALIZADO");
           exit( -1 );
       }
-      std::unique_ptr<IDispositivo> pDisp( new Dispositivo( config ) );
+      std::unique_ptr<IDispositivo> pDisp( new Dispositivo( numDisp, config, nombreProceso ) );
       MENSAJE_DEBUG("En plataforma, esperando que robot arme... ");
-      int idRobotArmado = pDisp->IniciarArmado();
+      int idRobotArmado = pDisp->EsperarInicioArmado();
       MENSAJE_DEBUG( "Siendo armado por robot %d...", idRobotArmado );
-      pDisp->FinalizarArmado();
+      pDisp->EsperarFinArmado();
       MENSAJE_DEBUG( "Armado finalizando. Activando..." );
       pDisp->Activar();
       MENSAJE_DEBUG( "Activacion completa. Esperando espacho..." );
-      int idRobotDespacho = pDisp->Despachar();
+      int idRobotDespacho = pDisp->EsperarDespacho();
       MENSAJE_DEBUG( "Despachado por robot %d. Esperando empaque...", idRobotDespacho );
       int idRobotEmpaque = pDisp->Empacar();
       MENSAJE_DEBUG( "¡Empaque completado por robot %d!", idRobotEmpaque );

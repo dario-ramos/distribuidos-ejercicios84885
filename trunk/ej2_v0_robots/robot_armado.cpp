@@ -2,6 +2,7 @@
 #include "configuracion.h"
 #include "mensaje_debug.h"
 #include "plataforma.h"
+#include "dispositivo.h"
 #include "random.h"
 #include <memory>
 
@@ -13,51 +14,53 @@ using std::string;
 #define MENSAJE_ERROR(fmt, ...)  MensajeError( nombreProceso, fmt, ##__VA_ARGS__ )
 
 void ValidarArgumentos( int argc, char** argv ){
-      if( argc < 2 ){
-            MensajeError( Robots2::Constantes::NOMBRE_PROCESO_ROBOT_ARMADO, "Faltan parametros. Uso: %s <numRobot>", argv[0] );
-            exit(-1);
-      }
+    if( argc < 2 ){
+        MensajeError( Robots2::Constantes::NOMBRE_PROCESO_ROBOT_ARMADO, "Faltan parametros. Uso: %s <numRobot>", argv[0] );
+        exit(-1);
+    }
 }
 
-/*void ArmarDispositivo( IPlataformaArmado* pPlataforma,
-                       int* pCantDispSinPilas, int* pCantPilas,
+void ArmarDispositivo( IPlataformaArmado* pPlataforma,
+                       int* pCantPilas,
                        int numRobot,
-                       std::pair<int,int> demora, const string& nombreProceso ){
-      MENSAJE_DEBUG( "Lugar disponible, esperando que robot no este despachando..." );
-      pPlataforma->IniciarArmado( numRobot );
-      MENSAJE_DEBUG( "Armando..." );
-      Random::DemoraAleatoriaEnMilis( demora );
-      (*pCantDispSinPilas)--;
-      (*pCantPilas) -= 2;
-      MENSAJE_DEBUG( "Dispositivo listo, colocando en plataforma" );
-      pPlataforma->FinalizarArmado( numRobot );
-}*/
+                       std::pair<int,int> demora,
+                       const Configuracion& config,
+                       const string& nombreProceso ){
+    MENSAJE_DEBUG( "Lugar disponible, esperando que robot no este despachando..." );
+    int idDisp = pPlataforma->IniciarArmado( numRobot );
+    std::unique_ptr<IDispositivo> pDispositivo( new Dispositivo( idDisp, config, nombreProceso ) );
+    pDispositivo->IniciarArmado( numRobot );    
+    MENSAJE_DEBUG( "Armando..." );
+    Random::DemoraAleatoriaEnMilis( demora );
+    (*pCantPilas) -= 2;
+    MENSAJE_DEBUG( "Dispositivo listo, colocando en plataforma" );
+    pPlataforma->FinalizarArmado( numRobot );
+    pDispositivo->FinalizarArmado();
+}
 
 int main( int argc, char** argv ){
-      ValidarArgumentos( argc, argv );
-      int numRobot = atoi( argv[1] );
-      string nombreProceso = Robots2::Constantes::NOMBRE_PROCESO_ROBOT_ARMADO + string( argv[1] );
-      MENSAJE_DEBUG("PROCESO INICIADO");
-      Configuracion config;
-      if( !config.LeerDeArchivo() ){
-            MENSAJE_DEBUG( "Error al leer archivo de configuracion, revise formato" );
-            MENSAJE_DEBUG("PROCESO FINALIZADO");
-            exit( -1 );
-      }
-      std::unique_ptr<IPlataformaArmado> pPlataforma( new Plataforma( config, nombreProceso, Utils::MAGENTA ) );
-      int nPilas = config.ObtenerCantidadInicialPilas();
-      while( nPilas > 1 ){
-            //TODO <NIM>
-
-
-            MENSAJE_DEBUG( "Preguntando si plataforma llena" );
-            if( pPlataforma->Llena( numRobot ) ){
-                  sleep( 1000 ); //TODO No magic numbers
-                  continue;
-            }
-            /*ArmarDispositivo( pPlataforma.get(), &nDispSinPilas, &nPilas,
-                              numRobot, config.ObtenerDemoraArmado(), nombreProceso );*/
-      }
-      MENSAJE_DEBUG("PROCESO FINALIZADO");
-      return 0;
+    const int DEMORA_PLATAFORMA_VACIA = 1;
+    ValidarArgumentos( argc, argv );
+    int numRobot = atoi( argv[1] );
+    string nombreProceso = Robots2::Constantes::NOMBRE_PROCESO_ROBOT_ARMADO + string( argv[1] );
+    MENSAJE_DEBUG("PROCESO INICIADO");
+    Configuracion config;
+    if( !config.LeerDeArchivo() ){
+        MENSAJE_DEBUG( "Error al leer archivo de configuracion, revise formato" );
+        MENSAJE_DEBUG("PROCESO FINALIZADO");
+        exit( -1 );
+    }
+    std::unique_ptr<IPlataformaArmado> pPlataforma( new Plataforma( config, nombreProceso, Utils::MAGENTA ) );
+    int nPilas = config.ObtenerCantidadInicialPilas();
+    while( nPilas > 1 ){
+        MENSAJE_DEBUG( "Preguntando si plataforma vacia" );
+        if( pPlataforma->Vacia( numRobot ) ){
+            sleep( DEMORA_PLATAFORMA_VACIA );
+            continue;
+        }
+        ArmarDispositivo( pPlataforma.get(), &nPilas,
+                          numRobot, config.ObtenerDemoraArmado(), config, nombreProceso );
+    }
+    MENSAJE_DEBUG("PROCESO FINALIZADO");
+    return 0;
 }

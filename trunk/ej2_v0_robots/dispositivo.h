@@ -1,16 +1,25 @@
 #pragma once
 
 #include "idispositivo.h"
+#include <string>
 
 class Configuracion;
 
 class Dispositivo : public IDispositivo{
+    int                 m_Cola;
+    int                 m_Id;
+    std::pair<int,int>  m_DemoraActivacion;
+    std::string         m_NombreProceso;
 public:
-    Dispositivo( const Configuracion& config );
+    Dispositivo( int id, const Configuracion& config, const std::string& nombreProceso );
     virtual ~Dispositivo();
-    virtual int Despachar();
     virtual int Empacar();
-    virtual int IniciarArmado();
+    virtual int EsperarDespacho();
+    virtual int EsperarInicioArmado();
+    virtual void IniciarArmado( int idRobot );
     virtual void Activar();
+    virtual void Despachar( int idRobot );
+    virtual void EsperarFinActivacion();
+    virtual void EsperarFinArmado();
     virtual void FinalizarArmado();
 };
