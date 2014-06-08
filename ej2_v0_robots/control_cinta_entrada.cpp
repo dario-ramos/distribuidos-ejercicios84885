@@ -2,6 +2,7 @@
 #include "cinta_entrada.h"
 #include "configuracion.h"
 #include "mensaje_debug.h"
+#include "random.h"
 #include <functional>
 #include <memory>
 
@@ -38,7 +39,8 @@ int main( int argc, char** argv ){
                                                   HayMasDispositivos_N;
     std::unique_ptr<ICintaEntrada> pCinta( new CintaEntrada( config, NOMBRE_PROCESO ) ); 
     for( int iDisp = 1; condicionCorte( iDisp, cantDisp ); iDisp++ ){
-        pCinta->GenerarDispositivo( iDisp );
+        int tipoDisp = Random::NumeroAleatorio( 1, ObtenerCantidadTiposDeDispositivo() );
+        pCinta->GenerarDispositivo( iDisp, tipoDisp );
     }
     MENSAJE_DEBUG("PROCESO FINALIZADO");
     return 0;

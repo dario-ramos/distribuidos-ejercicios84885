@@ -3,11 +3,15 @@
 #include <cstdlib>
 
 namespace Random{
-    bool BooleanoAleatorio(){
+    inline bool BooleanoAleatorio(){
         return (rand() % 2 == 0);
     }
 
-    void DemoraAleatoriaEnMilis( std::pair<int,int> minYMaxMilis ){
+    inline int NumeroAleatorio( int min, int max ){
+        return min + rand() % (max-min+1);
+    }
+
+    inline void DemoraAleatoriaEnMilis( std::pair<int,int> minYMaxMilis ){
         int demora = minYMaxMilis.first + rand() % ( minYMaxMilis.second - minYMaxMilis.first );
         usleep( demora * 1000 );
     }

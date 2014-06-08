@@ -56,14 +56,29 @@ void CintaEntrada::LanzarProcesoDispositivo( int iDisp ){
     }
 }
 
-void CintaEntrada::GenerarDispositivo( int idDispositivo ){
-    m_pMutex->P();    
-    if( m_pShm->EspaciosOcupados == m_pShm->Capacidad ){
+void CintaEntrada::GenerarDispositivo( int idDispositivo, int tipoDispositivo ){
+    m_pMutex->P();
+    int capacidad = m_pShm->Capacidad;
+    //Si plataforma llena, esperar que se libere un lugar
+    if( m_pShm->EspaciosOcupados == capacidad ){
         m_pMutex->V();
         MENSAJE_DEBUG( "Plataforma llena, cinta detenida" );
         m_pSemBloquearCinta->P();
         return;
     }
+    //Colocar dispositivo en primera posicion libre
+    for( int i=0; i < capacidad; i++ ){
+        if( m_pShm->EstadoDePosiciones[i] != Robots2::EPP_LIBRE )
+            continue;
+        m_pShm->EstadoDePosiciones[i] = Robots2::EPP_OCUPADA_SIN_ARMAR;
+        m_pShm->Dispositivos[i] = idDispositivo;
+        m_pShm->TipoDispositivo[i] = tipoDispositivo;
+        m_pShm->EspaciosOcupados++;
+        MENSAJE_DEBUG( "Dispositivo %d colocado en posicion %d, espacios ocupados: %d/%d",
+                       idDispositivo, i, m_pShm->EspaciosOcupados, capacidad );
+        break;
+    }
+    //Lanzar proceso dispositivo
     LanzarProcesoDispositivo( idDispositivo );
     m_pMutex->V();
 }

@@ -44,9 +44,9 @@ int Configuracion::ObtenerCapacidadPlataforma() const{
       return StringUtils::Parse<int>( ObtenerValorParametro( "CapacidadPlataforma" ) );
 }
 
-/*int Configuracion::ObtenerIdColaPlataforma() const{
+int Configuracion::ObtenerIdColaPlataforma() const{
       return std::stoi( ObtenerValorParametro( "IdColaPlataforma" ) );
-}*/
+}
 
 int Configuracion::ObtenerIdMutexPlataforma() const{
       return std::stoi( ObtenerValorParametro( "IdMutexPlataforma" ) );
@@ -60,7 +60,7 @@ int Configuracion::ObtenerIdShmPlataforma() const{
       return std::stoi( ObtenerValorParametro( "IdShmPlataforma" ) );
 }
 
-/*int Configuracion::ObtenerIdSemaforoRobotArmado( int nroRobot ) const{
+int Configuracion::ObtenerIdSemaforoRobotArmado( int nroRobot ) const{
       return std::stoi( ObtenerValorParametro( "IdBaseSemaforosRobotsArmado" ) ) + nroRobot;
 }
 
@@ -81,7 +81,7 @@ std::pair<int,int> Configuracion::ObtenerDemoraArmado() const{
 std::pair<int,int> Configuracion::ObtenerDemoraDespacho() const{
     return std::pair<int,int>( std::stoi( ObtenerValorParametro("MinDemoraDespacho") ),
                                std::stoi( ObtenerValorParametro("MaxDemoraDespacho") ) );
-}*/
+}
 
 int Configuracion::ObtenerCantidadDispositivosAGenerar() const{
     return std::stoi( ObtenerValorParametro( "CantidadDispositivosAGenerar" ) );
@@ -89,4 +89,16 @@ int Configuracion::ObtenerCantidadDispositivosAGenerar() const{
 
 int Configuracion::ObtenerCantidadTiposDeDispositivo() const{
     return std::stoi( ObtenerValorParametro( "CantidadTiposDeDispositivo" ) );
+}
+
+int Configuracion::ObtenerIdBaseColasDispositivos() const{
+    return std::stoi( ObtenerValorParametro( "IdBaseColasDispositivos" ) );
+}
+
+int Configuracion::ObtenerCantMaxDispositivos() const{
+    return std::stoi( ObtenerValorParametro( "CantMaxDispositivos" ) );
+}
+
+int Configuracion::ObtenerIdColaDispositivo( int idDispositivo ) const{
+    return ObtenerIdBaseColasDispositivos() + idDispositivo;
 }

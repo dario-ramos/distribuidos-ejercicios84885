@@ -35,7 +35,7 @@ int main( int argc, char** argv ){
           MENSAJE_DEBUG("Esperando frecuencia de activacion...");
           int posDisp = pPlataforma->DetectarFrecuenciaActivacion( numRobot );
           MENSAJE_DEBUG("Frecuencia de activacion detectada, despachando...");
-          //Random::DemoraAleatoriaEnMilis( config.ObtenerDemoraDespacho() );
+          Random::DemoraAleatoriaEnMilis( config.ObtenerDemoraDespacho() );
           pPlataforma->DespacharDispositivo( numRobot, posDisp );
           MENSAJE_DEBUG("Dispositivo despachado");
       }
