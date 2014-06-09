@@ -7,33 +7,33 @@ using namespace std;
 const string Configuracion::DEFAULT_FILE_PATH = "config.ini";
 
 bool Configuracion::LeerDeArchivo( std::string path ){
-      ifstream archivoConfig( path.c_str() );
-      if( !archivoConfig.is_open() )
-            return false;
-      while( !archivoConfig.eof() ){
-            string linea;
-            getline( archivoConfig, linea );
-            vector<string> claveYValor = StringUtils::Split( linea, '=' );
-            if( claveYValor.size() != 2 )
-                  continue;
-            m_Parametros[ claveYValor[0] ] = claveYValor[1];
-      }
-      return true;
+    ifstream archivoConfig( path.c_str() );
+    if( !archivoConfig.is_open() )
+        return false;
+    while( !archivoConfig.eof() ){
+        string linea;
+        getline( archivoConfig, linea );
+        vector<string> claveYValor = StringUtils::Split( linea, '=' );
+        if( claveYValor.size() != 2 )
+            continue;
+        m_Parametros[ claveYValor[0] ] = claveYValor[1];
+    }
+    return true;
 }
 
 string Configuracion::ObtenerValorParametro( const string& nombreParam ) const{
-      map<string,string>::const_iterator it = m_Parametros.find( nombreParam );
-      if( it == m_Parametros.end() )
-            return "";
-      return it->second;
+    map<string,string>::const_iterator it = m_Parametros.find( nombreParam );
+    if( it == m_Parametros.end() )
+        return "";
+    return it->second;
 }
 
 string Configuracion::ObtenerDirFtok() const{
-      return ObtenerValorParametro( "DirectorioFtok" );
+    return ObtenerValorParametro( "DirectorioFtok" );
 }
 
 int Configuracion::ObtenerCantidadInicialPilas() const{
-      return StringUtils::Parse<int>( ObtenerValorParametro( "CantidadInicialPilas" ) );
+    return StringUtils::Parse<int>( ObtenerValorParametro( "CantidadInicialPilas" ) );
 }
 
 int Configuracion::ObtenerCantidadRobots() const{
@@ -41,27 +41,27 @@ int Configuracion::ObtenerCantidadRobots() const{
 }
 
 int Configuracion::ObtenerCapacidadPlataforma() const{
-      return StringUtils::Parse<int>( ObtenerValorParametro( "CapacidadPlataforma" ) );
+    return StringUtils::Parse<int>( ObtenerValorParametro( "CapacidadPlataforma" ) );
 }
 
 int Configuracion::ObtenerIdColaPlataforma() const{
-      return std::stoi( ObtenerValorParametro( "IdColaPlataforma" ) );
+    return std::stoi( ObtenerValorParametro( "IdColaPlataforma" ) );
 }
 
 int Configuracion::ObtenerIdMutexPlataforma() const{
-      return std::stoi( ObtenerValorParametro( "IdMutexPlataforma" ) );
+    return std::stoi( ObtenerValorParametro( "IdMutexPlataforma" ) );
 }
 
 int Configuracion::ObtenerIdSemaforoCinta() const{
-      return std::stoi( ObtenerValorParametro( "IdSemaforoCinta" ) );
+    return std::stoi( ObtenerValorParametro( "IdSemaforoCinta" ) );
 }
 
 int Configuracion::ObtenerIdShmPlataforma() const{
-      return std::stoi( ObtenerValorParametro( "IdShmPlataforma" ) );
+    return std::stoi( ObtenerValorParametro( "IdShmPlataforma" ) );
 }
 
 int Configuracion::ObtenerIdSemaforoRobotArmado( int nroRobot ) const{
-      return std::stoi( ObtenerValorParametro( "IdBaseSemaforosRobotsArmado" ) ) + nroRobot;
+    return std::stoi( ObtenerValorParametro( "IdBaseSemaforosRobotsArmado" ) ) + nroRobot;
 }
 
 int Configuracion::ObtenerIdSemaforoRobotDespacho( int nroRobot ) const{
@@ -83,6 +83,11 @@ std::pair<int,int> Configuracion::ObtenerDemoraDespacho() const{
                                std::stoi( ObtenerValorParametro("MaxDemoraDespacho") ) );
 }
 
+std::pair<int,int> Configuracion::ObtenerDemoraEmpaque() const{
+    return std::pair<int,int>( std::stoi( ObtenerValorParametro("MinDemoraEmpaque") ),
+                               std::stoi( ObtenerValorParametro("MaxDemoraEmpaque") ) );
+}
+
 int Configuracion::ObtenerCantidadDispositivosAGenerar() const{
     return std::stoi( ObtenerValorParametro( "CantidadDispositivosAGenerar" ) );
 }
@@ -95,10 +100,18 @@ int Configuracion::ObtenerIdBaseColasDispositivos() const{
     return std::stoi( ObtenerValorParametro( "IdBaseColasDispositivos" ) );
 }
 
+int Configuracion::ObtenerIdBaseColasRobotsEmpaque() const{
+    return std::stoi( ObtenerValorParametro( "IdBaseColasRobotsEmpaque" ) );
+}
+
 int Configuracion::ObtenerCantMaxDispositivos() const{
     return std::stoi( ObtenerValorParametro( "CantMaxDispositivos" ) );
 }
 
 int Configuracion::ObtenerIdColaDispositivo( int idDispositivo ) const{
     return ObtenerIdBaseColasDispositivos() + idDispositivo;
+}
+
+int Configuracion::ObtenerIdColaRobotEmpaque( int idRobot ) const{
+    return ObtenerIdBaseColasRobotsEmpaque() + idRobot;
 }

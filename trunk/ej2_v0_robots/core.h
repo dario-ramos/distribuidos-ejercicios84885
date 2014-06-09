@@ -37,6 +37,7 @@ namespace MensajesDispositivo{
     const int FINALIZAR_ARMADO = 3002;
     const int ACTIVACION_FINALIZADA = 3003;
     const int DESPACHO_FINALIZADO =  3004;
+    const int EMPAQUE_FINALIZADO = 3005;
 }
 
 typedef struct{
@@ -44,6 +45,12 @@ typedef struct{
     int Msg;
     int DatosMsg;
 } MensajeColaDispositivo;
+
+typedef struct{
+    long Tipo;
+    int Msg;
+    int DatosMsg;
+} MensajeColaRobotEmpaque;
 
 namespace MensajesPlataforma{
     const int PREGUNTA_PLATAFORMA_VACIA = 5001;
@@ -57,12 +64,17 @@ namespace MensajesPlataforma{
     const int PEDIDO_DISPOSITIVO_ACTIVADO = 5009;
 }
 
+namespace MensajesRobotEmpaque{
+    const int INICIAR_EMPAQUE = 6001;
+}
+
 namespace TipoMensajes{
       const long PEDIDO_A_PLATAFORMA = 7001;
 
       inline int RespuestaARobotArmado( int numeroRobot ){ return 9000 + numeroRobot; }
       inline int RespuestaARobotDespacho( int numeroRobot ){ return 12000 + numeroRobot; }
       inline int MensajeColaDispositivo( int idDisp ){ return 13000 + idDisp; }
+      inline int MensajeColaRobotEmpaque( int idRobot ){ return 14000 + idRobot; }
 }
 
 typedef struct{

@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -std=c++11 -Wall
 LDFLAGS = -lm
-BINARIES = lanzador finalizador control_cinta_entrada control_dispositivo robot_armado robot_despacho robot_empaque control_plataforma
+BINARIES = lanzador finalizador control_cinta_entrada control_dispositivo robot_armado robot_despacho control_robot_empaque control_plataforma
 
 all : ${BINARIES}
 
@@ -11,11 +11,11 @@ clean :
 configuracion.o : configuracion.cpp configuracion.h string_utils.h
 	${CC} ${CFLAGS} -c configuracion.cpp
 	
-control_plataforma.o : control_plataforma.cpp mensaje_debug.h core.h configuracion.h t_sem.h dispositivo.h
+control_plataforma.o : control_plataforma.cpp mensaje_debug.h core.h configuracion.h t_sem.h dispositivo.h robot_empaque.h
 	${CC} ${CFLAGS} -c control_plataforma.cpp
 
-control_plataforma : control_plataforma.o configuracion.o dispositivo.o
-	${CC} ${CFLAGS} control_plataforma.o configuracion.o dispositivo.o ${LDFLAGS} -o control_plataforma
+control_plataforma : control_plataforma.o configuracion.o dispositivo.o robot_empaque.o
+	${CC} ${CFLAGS} control_plataforma.o configuracion.o dispositivo.o robot_empaque.o ${LDFLAGS} -o control_plataforma
 
 finalizador.o : finalizador.cpp mensaje_debug.h core.h configuracion.h
 	${CC} ${CFLAGS} -c finalizador.cpp
@@ -62,8 +62,11 @@ control_dispositivo.o: control_dispositivo.cpp core.h mensaje_debug.h dispositiv
 control_dispositivo: control_dispositivo.o dispositivo.o configuracion.o
 	${CC} ${CFLAGS} control_dispositivo.o dispositivo.o configuracion.o ${LDFLAGS} -o control_dispositivo
 
-robot_empaque.o: robot_empaque.cpp mensaje_debug.h core.h
+robot_empaque.o: robot_empaque.cpp irobot_empaque.h configuracion.h random.h core.h dispositivo.h
 	${CC} ${CFLAGS} -c robot_empaque.cpp
 
-robot_empaque: robot_empaque.o
-	${CC} ${CFLAGS} robot_empaque.o ${LDFLAGS} -o robot_empaque
+control_robot_empaque.o: control_robot_empaque.cpp mensaje_debug.h core.h robot_empaque.h
+	${CC} ${CFLAGS} -c control_robot_empaque.cpp
+
+control_robot_empaque: control_robot_empaque.o robot_empaque.o configuracion.o dispositivo.o
+	${CC} ${CFLAGS} control_robot_empaque.o robot_empaque.o configuracion.o dispositivo.o ${LDFLAGS} -o control_robot_empaque
