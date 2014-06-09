@@ -19,4 +19,4 @@ public:
     CintaEntrada( const Configuracion& config, const std::string& nombreProceso );
     virtual ~CintaEntrada();
     virtual void GenerarDispositivo( int idDispositivo, int tipoDispositivo );
-}; 
+};

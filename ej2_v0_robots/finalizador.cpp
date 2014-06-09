@@ -93,8 +93,8 @@ void LiberarCola( const string& dirFtok, int idCola ){
       }
 }
 
-void LiberarColasDispositivos( const string& dirFtok, int idBase, int nMaxDisp ){
-    for( int i=0; i<nMaxDisp; i++ ){
+void LiberarColas( const string& dirFtok, int idBase, int nColas ){
+    for( int i=0; i<nColas; i++ ){
         LiberarCola( dirFtok, idBase + i );
     }
 }
@@ -110,10 +110,12 @@ int main( int argc, char** argv ){
     int cantRobots = config.ObtenerCantidadRobots();
     MatarProcesoPorNombre( Robots2::Constantes::NOMBRE_PROCESO_CINTA_ENTRADA );
     string dirFtok = config.ObtenerDirFtok();
-    LiberarColasDispositivos( dirFtok, config.ObtenerIdBaseColasDispositivos(),
-                              config.ObtenerCantMaxDispositivos() );
+    LiberarColas( dirFtok, config.ObtenerIdBaseColasDispositivos(),
+                  config.ObtenerCantMaxDispositivos() );
     MatarProcesosRobotsArmadoYDespacho( cantRobots );
     MatarProcesosRobotsEmpaque( config.ObtenerCantidadTiposDeDispositivo() );
+    LiberarColas( dirFtok, config.ObtenerIdBaseColasRobotsEmpaque(),
+                  config.ObtenerCantMaxDispositivos() );
     for( int i=1; i<=cantRobots; i++ ){
         MatarProcesoPorNombre( Robots2::Constantes::NOMBRE_PROCESO_PLATAFORMA +
                                std::to_string( i ) );

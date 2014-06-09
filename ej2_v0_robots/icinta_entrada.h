@@ -2,7 +2,7 @@
 
 class ICintaEntrada{
 public:
-    virtual void GenerarDispositivo( int idDispositivo ) = 0;
+    virtual void GenerarDispositivo( int idDispositivo, int tipoDispositivo ) = 0;
     inline virtual ~ICintaEntrada() = 0;
 };
 

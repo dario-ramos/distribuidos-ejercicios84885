@@ -13,12 +13,13 @@ class Dispositivo : public IDispositivo{
 public:
     Dispositivo( int id, const Configuracion& config, const std::string& nombreProceso );
     virtual ~Dispositivo();
-    virtual int Empacar();
     virtual int EsperarDespacho();
+    virtual int EsperarEmpaque();
     virtual int EsperarInicioArmado();
     virtual void IniciarArmado( int idRobot );
     virtual void Activar();
     virtual void Despachar( int idRobot );
+    virtual void Empacar( int idRobot );
     virtual void EsperarFinActivacion();
     virtual void EsperarFinArmado();
     virtual void FinalizarArmado();

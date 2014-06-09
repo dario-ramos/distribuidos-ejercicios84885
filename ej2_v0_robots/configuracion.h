@@ -17,8 +17,10 @@ public:
     int ObtenerCantMaxDispositivos() const;
     int ObtenerCapacidadPlataforma() const;
     int ObtenerIdBaseColasDispositivos() const;
+    int ObtenerIdBaseColasRobotsEmpaque() const;
     int ObtenerIdColaDispositivo( int idDispositivo ) const;
     int ObtenerIdColaPlataforma() const;
+    int ObtenerIdColaRobotEmpaque( int idRobot ) const;
     int ObtenerIdMutexPlataforma() const;
     int ObtenerIdSemaforoCinta() const;
     int ObtenerIdSemaforoRobotArmado( int nroRobot ) const;
@@ -27,6 +29,7 @@ public:
     std::pair<int,int> ObtenerDemoraActivacion() const;
     std::pair<int,int> ObtenerDemoraArmado() const;
     std::pair<int,int> ObtenerDemoraDespacho() const;
+    std::pair<int,int> ObtenerDemoraEmpaque() const;
     std::string ObtenerDirFtok() const;
 };
 

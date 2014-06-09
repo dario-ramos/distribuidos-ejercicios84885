@@ -26,11 +26,6 @@ Dispositivo::Dispositivo( int id, const Configuracion& config, const string& nom
 
 Dispositivo::~Dispositivo(){}
 
-int Dispositivo::Empacar(){
-    //TODO <NIM>
-    return -1;
-}
-
 int Dispositivo::EsperarInicioArmado(){
     //Esperar mensaje de inicio de armado
     Robots2::MensajeColaDispositivo msj;
@@ -142,6 +137,35 @@ void Dispositivo::Despachar( int idRobot ){
     int codError = msgsnd( m_Cola, &msj, sizeof(msj)-sizeof(long), 0 );
     if( codError == -1 ){
         MENSAJE_ERROR( "Error al enviar DESPACHO_FINALIZADO " );
+        exit( 5 );
+    }
+}
+
+int Dispositivo::EsperarEmpaque(){
+    //Esperar mensaje de fin de empaque
+    Robots2::MensajeColaDispositivo msj;
+    int codError = msgrcv( m_Cola, &msj, sizeof(msj)-sizeof(long),
+                           Robots2::TipoMensajes::MensajeColaDispositivo( m_Id ), 0 );
+    if( codError == -1 ){
+        MENSAJE_ERROR( "Error al recibir mensaje de Fin de empaque" );
+        exit( 5 );
+    }
+    if( msj.Msg != Robots2::MensajesDispositivo::EMPAQUE_FINALIZADO ){
+        MENSAJE_ERROR( "Se esperaba un mensaje de Empaque Finalizado pero llego otro" );
+        exit( 5 );
+    }
+    return msj.DatosMsg;
+}
+
+void Dispositivo::Empacar( int idRobot ){
+    Robots2::MensajeColaDispositivo msj = {
+        Robots2::TipoMensajes::MensajeColaDispositivo( m_Id ), //Tipo
+        Robots2::MensajesDispositivo::EMPAQUE_FINALIZADO,      //Msg
+        idRobot                                                //DatosMsg
+    };
+    int codError = msgsnd( m_Cola, &msj, sizeof(msj)-sizeof(long), 0 );
+    if( codError == -1 ){
+        MENSAJE_ERROR( "Error al enviar EMPAQUE_FINALIZADO " );
         exit( 5 );
     }
 }

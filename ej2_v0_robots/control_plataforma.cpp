@@ -1,6 +1,7 @@
 #include "core.h"
 #include "configuracion.h"
 #include "dispositivo.h"
+#include "robot_empaque.h"
 #include "mensaje_debug.h"
 #include "t_sem.h"
 #include <sys/msg.h>
@@ -142,7 +143,8 @@ void ProcesarMensajeDespacharDispositivo( Robots2::ShmPlataforma* pPlataforma,
                                           std::vector< std::unique_ptr<t_sem> >& semaforosDespacho,
                                           const Configuracion& config,
                                           const string& nombreProceso,
-                                          int nroRobot, int posDisp ){
+                                          int nroRobot, int posDisp,
+                                          const std::vector< std::unique_ptr<IRobotEmpaque> >& robotsEmpaque ){
     mutex.P();
     MENSAJE_DEBUG( "Robot %d despachando disp en pos %d", nroRobot, posDisp );
     pPlataforma->EstadoDePosiciones[ posDisp ] = Robots2::EPP_LIBRE;
@@ -160,6 +162,7 @@ void ProcesarMensajeDespacharDispositivo( Robots2::ShmPlataforma* pPlataforma,
     pPlataforma->Dispositivos[posDisp] = -1;
     pPlataforma->TipoDispositivo[posDisp] = -1;
     pDispositivo->Despachar( nroRobot );
+    robotsEmpaque[tipoDisp-1]->IniciarEmpaqueDeDispositivo( idDisp );
     mutex.V();
 }
 
@@ -170,7 +173,8 @@ void ProcesarMensaje( Robots2::ShmPlataforma* pPlataforma,
                       int idCola,
                       const Configuracion& config,
                       const string& nombreProceso,
-                      const Robots2::MensajeColaPlataforma& pedido ){
+                      const Robots2::MensajeColaPlataforma& pedido,
+                      const std::vector< std::unique_ptr<IRobotEmpaque> >& robotsEmpaque ){
     //MENSAJE_DEBUG( "Procesando pedido %s", pedido.ToString().c_str() );
     //MensajeDebug( nombreProceso, Utils::VERDE, "Procesando pedido %s de robot %d", pedido.ToString().c_str(), pedido.NroRobot );
     switch( pedido.Msg ){
@@ -193,7 +197,8 @@ void ProcesarMensaje( Robots2::ShmPlataforma* pPlataforma,
             ProcesarMensajeDespacharDispositivo( pPlataforma, mutex, semCintaEntrada,
                                                  semaforosArmado, semaforosDespacho,
                                                  config, nombreProceso,
-                                                 pedido.NroRobot, pedido.DatosMsg );
+                                                 pedido.NroRobot, pedido.DatosMsg,
+                                                 robotsEmpaque );
             break;
         default:
             MENSAJE_ERROR( "Mensaje desconocido recibido" );
@@ -245,7 +250,7 @@ int main( int argc, char** argv ){
     //Instanciar componentes de robots empacadores
     std::vector< std::unique_ptr<IRobotEmpaque> > robotsEmpaque;
     for( int i=1; i<= config.ObtenerCantidadTiposDeDispositivo(); i++ )
-        robotsEmpaque.push_back( new RobotEmpaque(i) );
+        robotsEmpaque.push_back( std::unique_ptr<IRobotEmpaque>( new RobotEmpaque(i, nombreProceso, config) ) );
     while( true ){
         //MENSAJE_DEBUG( "Esperando pedido..." );
         Robots2::MensajeColaPlataforma mensaje;
@@ -255,7 +260,7 @@ int main( int argc, char** argv ){
             exit(1);
         }
         ProcesarMensaje( pPlataforma, mutex, semCintaEntrada, semaforosArmado, semaforosDespacho,
-                         cola, config, nombreProceso, mensaje );
+                         cola, config, nombreProceso, mensaje, robotsEmpaque );
     }
     MENSAJE_DEBUG("PROCESO FINALIZADO");
     return 0;

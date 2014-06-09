@@ -155,8 +155,8 @@ void InicializarCola( const std::string& dirFtok, int idCola ){
       }
 }
 
-void InicializarColasDispositivos( const std::string& dirFtok, int idBase, int nMaxDisp ){
-    for( int i=0; i<nMaxDisp; i++ )
+void InicializarColas( const std::string& dirFtok, int idBase, int nColas ){
+    for( int i=0; i<nColas; i++ )
       InicializarCola( dirFtok, idBase + i );
 }
 
@@ -177,9 +177,11 @@ int main( int argc, char** argv ){
     int cantRobots = config.ObtenerCantidadRobots();
     LanzarProcesosDePlataforma( cantRobots );
     LanzarProcesosDeRobotsDeArmadoYDespacho( cantRobots );
+    InicializarColas( dirFtok, config.ObtenerIdBaseColasRobotsEmpaque(),
+                      config.ObtenerCantMaxDispositivos() );
     LanzarProcesosDeRobotsEmpacadores( config.ObtenerCantidadTiposDeDispositivo() );
-    InicializarColasDispositivos( dirFtok, config.ObtenerIdBaseColasDispositivos(),
-                                  config.ObtenerCantMaxDispositivos() );
+    InicializarColas( dirFtok, config.ObtenerIdBaseColasDispositivos(),
+                      config.ObtenerCantMaxDispositivos() );
     LanzarProcesoCintaEntrada();
     MENSAJE_DEBUG("PROCESO FINALIZADO");
     return 0;

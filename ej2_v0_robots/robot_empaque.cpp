@@ -1,40 +1,67 @@
+#include "robot_empaque.h"
+#include "dispositivo.h"
 #include "core.h"
+#include "configuracion.h"
 #include "mensaje_debug.h"
+#include "random.h"
+#include <sys/msg.h>
+#include <memory>
 
 using namespace Utils;
 using std::string;
 
 //Para no repetir el primer parametro en cada llamada
-#define MENSAJE_DEBUG(fmt, ...)  MensajeDebug( nombreProceso, Utils::VERDE, fmt, ##__VA_ARGS__ )
-#define MENSAJE_ERROR(fmt, ...)  MensajeError( nombreProceso, fmt, ##__VA_ARGS__ )
+#define MENSAJE_DEBUG(fmt, ...)  MensajeDebug( m_NombreProceso, Utils::VERDE, fmt, ##__VA_ARGS__ )
+#define MENSAJE_ERROR(fmt, ...)  MensajeError( m_NombreProceso, fmt, ##__VA_ARGS__ )
 
-void ValidarArgumentos( int argc, char** argv ){
-      if( argc < 2 ){
-            MensajeError( Robots2::Constantes::NOMBRE_PROCESO_ROBOT_DESPACHO, "Faltan parametros. Uso: %s <numRobot>", argv[0] );
-            exit(-1);
-      }
+RobotEmpaque::RobotEmpaque( int idRobot, const std::string& nombreProceso, const Configuracion& config ):
+        m_Config( config ),
+        m_Id( idRobot ),
+        m_NombreProceso( nombreProceso ){
+    int idCola = m_Config.ObtenerIdColaRobotEmpaque( m_Id );
+    m_DemoraEmpaque = m_Config.ObtenerDemoraEmpaque();
+    m_Cola = msgget( ftok( m_Config.ObtenerDirFtok().c_str(), idCola ), 0660 );
+    if( m_Cola == -1 ){
+        MENSAJE_ERROR( "Error al conectarse a la cola %d", idCola );
+        exit(1);
+    }
 }
 
-int main( int argc, char** argv ){
-      ValidarArgumentos( argc, argv );
-      int numRobot = atoi( argv[1] );
-      string nombreProceso = Robots2::Constantes::NOMBRE_PROCESO_ROBOT_EMPAQUE + string( argv[1] );
-      MENSAJE_DEBUG("PROCESO INICIADO");
-      /*Configuracion config;
-      if( !config.LeerDeArchivo() ){
-            MENSAJE_DEBUG( "Error al leer archivo de configuracion, revise formato" );
-            MENSAJE_DEBUG("PROCESO FINALIZADO");
-            exit( -1 );
-      }*/
-      /*std::unique_ptr<IPlataformaDespacho> pPlataforma( new Plataforma( config, nombreProceso, Utils::CIAN ) );
-      while( true ){
-          MENSAJE_DEBUG("Esperando frecuencia de activacion...");
-          int posDisp = pPlataforma->DetectarFrecuenciaActivacion( numRobot );
-          MENSAJE_DEBUG("Frecuencia de activacion detectada, despachando...");
-          //Random::DemoraAleatoriaEnMilis( config.ObtenerDemoraDespacho() );
-          pPlataforma->DespacharDispositivo( numRobot, posDisp );
-          MENSAJE_DEBUG("Dispositivo despachado");
-      }*/
-      MENSAJE_DEBUG("PROCESO FINALIZADO");
-      return 0;
+RobotEmpaque::~RobotEmpaque(){}
+
+void RobotEmpaque::EmpacarDispositivo(){
+    MENSAJE_DEBUG( "Esperando que llegue dispositivo para empacar..." );
+    //Esperar mensaje de inicio de empaque
+    Robots2::MensajeColaRobotEmpaque msj;
+    int codError = msgrcv( m_Cola, &msj, sizeof(msj)-sizeof(long),
+                           Robots2::TipoMensajes::MensajeColaRobotEmpaque( m_Id ), 0 );
+    if( codError == -1 ){
+        MENSAJE_ERROR( "Error al recibir mensaje de Fin de Iniciar Empaque" );
+        exit( 5 );
+    }
+    if( msj.Msg != Robots2::MensajesRobotEmpaque::INICIAR_EMPAQUE ){
+        MENSAJE_ERROR( "Se esperaba un mensaje de Iniciar Empaque pero llego otro" );
+        exit( 5 );
+    }
+    //Empacar
+    int idDisp = msj.DatosMsg;
+    MENSAJE_DEBUG( "¡Dispositivo %d recibido! Empacando...", idDisp );
+    Random::DemoraAleatoriaEnMilis( m_DemoraEmpaque );
+    MENSAJE_DEBUG( "¡Empaque de dispositivo %d finalizando!", idDisp );
+    //Notificar dispositivo
+    std::unique_ptr<IDispositivo> pDisp( new Dispositivo( idDisp, m_Config, m_NombreProceso ) );
+    pDisp->Empacar( m_Id );
+}
+
+void RobotEmpaque::IniciarEmpaqueDeDispositivo( int idDisp ){
+    Robots2::MensajeColaRobotEmpaque msj = {
+        Robots2::TipoMensajes::MensajeColaRobotEmpaque( m_Id ), //Tipo
+        Robots2::MensajesRobotEmpaque::INICIAR_EMPAQUE,         //Msg
+        idDisp                                                  //DatosMsg
+    };
+    int codError = msgsnd( m_Cola, &msj, sizeof(msj)-sizeof(long), 0 );
+    if( codError == -1 ){
+        MENSAJE_ERROR( "Error al enviar INICIAR_EMPAQUE " );
+        exit( 5 );
+    }
 }
