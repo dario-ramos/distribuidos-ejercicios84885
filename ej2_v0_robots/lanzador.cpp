@@ -5,6 +5,7 @@
 #include <sys/msg.h>
 #include <sys/shm.h>
 #include <sys/ipc.h>
+#include <sys/stat.h>
 
 using namespace Utils;
 using std::string;
@@ -14,20 +15,20 @@ using std::string;
 #define MENSAJE_ERROR(fmt, ...)  MensajeError( "LANZADOR", fmt, ##__VA_ARGS__ )
 
 void LanzarProcesosDePlataforma( int cantRobots ){
-      for( int i=1; i<=cantRobots; i++ ){
-            char sPlat[8];
-            sprintf( sPlat, "%d", i );
-            int pid;
-            if( (pid = fork()) <0 ){
-                  MENSAJE_ERROR("Error al hacer fork de control_plataforma %d", i);
-                  exit(1);
-            }else if( pid == 0 ){//Hijo
-                  execlp( string("./" + Robots2::Constantes::NOMBRE_PROCESO_PLATAFORMA).c_str(),
-                        Robots2::Constantes::NOMBRE_PROCESO_PLATAFORMA.c_str(), sPlat, reinterpret_cast<char*>(0) );
-                  MENSAJE_ERROR("Proceso plataforma fallo");
-                  exit(1);
-            }
-      }
+    for( int i=1; i<=cantRobots; i++ ){
+        char sPlat[8];
+        sprintf( sPlat, "%d", i );
+        int pid;
+        if( (pid = fork()) <0 ){
+            MENSAJE_ERROR("Error al hacer fork de control_plataforma %d", i);
+            exit(1);
+        }else if( pid == 0 ){//Hijo
+            execlp( string("./" + Robots2::Constantes::NOMBRE_PROCESO_PLATAFORMA).c_str(),
+            Robots2::Constantes::NOMBRE_PROCESO_PLATAFORMA.c_str(), sPlat, reinterpret_cast<char*>(0) );
+            MENSAJE_ERROR("Proceso plataforma fallo");
+            exit(1);
+        }
+    }
 }
 
 void InicializarSemaforo( const int idSem, const string& dirFtok, const int valorInicial ){
@@ -51,38 +52,38 @@ void InicializarSemaforosRobots( const Configuracion& config ){
 }
 
 void InicializarSharedMemory( const string& dirFtok, const Configuracion& config ){
-      int idShmPlataforma = config.ObtenerIdShmPlataforma();
-      key_t clave = ftok( dirFtok.c_str(), idShmPlataforma );
-      Robots2::ShmPlataforma* pShmPlataforma = 0;
-      int capacidad = config.ObtenerCapacidadPlataforma();
-      if( capacidad > MAX_CAPACIDAD_PLATAFORMA ){
-            MENSAJE_ERROR( "Capacidad de plataforma, %d, excede el máximo (%d)",
-                           capacidad, MAX_CAPACIDAD_PLATAFORMA );
-            exit(1);
-      }
-      int handleShmPlataforma = shmget( clave, sizeof( pShmPlataforma ), IPC_CREAT | IPC_EXCL | 0660 );
-      if( handleShmPlataforma == -1 ){
-            MENSAJE_ERROR("Error al crear la Shared Memory con id %d", idShmPlataforma);
-            exit(1);
-      }else{
-           MENSAJE_DEBUG( "Shared Memory creada exitosamente con id %d", idShmPlataforma );
-      }
-      pShmPlataforma = static_cast<Robots2::ShmPlataforma*>( shmat( handleShmPlataforma, 0, 0 ) );
-      if( pShmPlataforma == reinterpret_cast<Robots2::ShmPlataforma*>(-1) ){
-            MENSAJE_ERROR( "Error en attach de Shared Memory" );
-            exit(1);
-      }else{
-            MENSAJE_DEBUG( "Shared Memory %d attacheada exitosamente", idShmPlataforma );
-      }
-      pShmPlataforma->Capacidad = capacidad;
-      pShmPlataforma->EspaciosOcupados = 0;
-      for( int i=0; i<capacidad; i++ ){
-            pShmPlataforma->EstadoDePosiciones[i] = Robots2::EPP_LIBRE;
-            pShmPlataforma->Dispositivos[i] = -1;
-            pShmPlataforma->TipoDispositivo[i] = -1;
-      }
-      pShmPlataforma->EstadoDePosiciones[capacidad] = Robots2::EPP_FIN_LISTA;
-      pShmPlataforma->Dispositivos[capacidad] = 0;
+    int idShmPlataforma = config.ObtenerIdShmPlataforma();
+    key_t clave = ftok( dirFtok.c_str(), idShmPlataforma );
+    Robots2::ShmPlataforma* pShmPlataforma = 0;
+    int capacidad = config.ObtenerCapacidadPlataforma();
+    if( capacidad > MAX_CAPACIDAD_PLATAFORMA ){
+        MENSAJE_ERROR( "Capacidad de plataforma, %d, excede el máximo (%d)",
+                       capacidad, MAX_CAPACIDAD_PLATAFORMA );
+        exit(1);
+    }
+    int handleShmPlataforma = shmget( clave, sizeof( pShmPlataforma ), IPC_CREAT | IPC_EXCL | 0660 );
+    if( handleShmPlataforma == -1 ){
+        MENSAJE_ERROR("Error al crear la Shared Memory con id %d", idShmPlataforma);
+        exit(1);
+    }else{
+        MENSAJE_DEBUG( "Shared Memory creada exitosamente con id %d", idShmPlataforma );
+    }
+    pShmPlataforma = static_cast<Robots2::ShmPlataforma*>( shmat( handleShmPlataforma, 0, 0 ) );
+    if( pShmPlataforma == reinterpret_cast<Robots2::ShmPlataforma*>(-1) ){
+        MENSAJE_ERROR( "Error en attach de Shared Memory" );
+        exit(1);
+    }else{
+        MENSAJE_DEBUG( "Shared Memory %d attacheada exitosamente", idShmPlataforma );
+    }
+    pShmPlataforma->Capacidad = capacidad;
+    pShmPlataforma->EspaciosOcupados = 0;
+    for( int i=0; i<capacidad; i++ ){
+        pShmPlataforma->EstadoDePosiciones[i] = Robots2::EPP_LIBRE;
+        pShmPlataforma->Dispositivos[i] = -1;
+        pShmPlataforma->TipoDispositivo[i] = -1;
+    }
+    pShmPlataforma->EstadoDePosiciones[capacidad] = Robots2::EPP_FIN_LISTA;
+    pShmPlataforma->Dispositivos[capacidad] = 0;
 }
 
 void LanzarProcesosDeRobotsDeArmadoYDespacho( int nRobots ){
@@ -145,14 +146,14 @@ void LanzarProcesoCintaEntrada(){
 }
 
 void InicializarCola( const std::string& dirFtok, int idCola ){
-      key_t clave = ftok( dirFtok.c_str(), idCola );
-      int handleCola = msgget( clave, IPC_CREAT | IPC_EXCL | 0660 );
-      if( handleCola == -1 ){
-            MENSAJE_ERROR("Lanzador: Error al crear Cola %d", idCola);
-            exit(1);
-      }else{
-            MENSAJE_DEBUG( "Cola %d creada exitosamente", handleCola );
-      }
+    key_t clave = ftok( dirFtok.c_str(), idCola );
+    int handleCola = msgget( clave, IPC_CREAT | IPC_EXCL | 0660 );
+    if( handleCola == -1 ){
+        MENSAJE_ERROR("Lanzador: Error al crear Cola %d", idCola);
+        exit(1);
+    }else{
+        MENSAJE_DEBUG( "Cola %d creada exitosamente", idCola );
+    }
 }
 
 void InicializarColas( const std::string& dirFtok, int idBase, int nColas ){
@@ -169,6 +170,16 @@ int main( int argc, char** argv ){
         exit( -1 );
     }
     string dirFtok = config.ObtenerDirFtok();
+    //Validar existencia de directorio ftok
+    struct stat sb;
+    if( stat(dirFtok.c_str(), &sb) != 0 ){
+        MENSAJE_ERROR( "No existe el directorio de ftok %s", dirFtok.c_str() );
+        exit(-1);
+    }
+    if( !S_ISDIR(sb.st_mode) ){
+        MENSAJE_ERROR( "No existe el directorio de ftok %s", dirFtok.c_str() );
+        exit(-1);
+    }
     InicializarSharedMemory( dirFtok, config );
     InicializarSemaforo( config.ObtenerIdSemaforoCinta(), dirFtok, 0 );
     InicializarSemaforo( config.ObtenerIdMutexPlataforma(), dirFtok, 1 );
