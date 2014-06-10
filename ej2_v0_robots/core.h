@@ -4,15 +4,15 @@
 
 namespace Robots2{
 
-#define MAX_CAPACIDAD_PLATAFORMA 1024
+#define MAX_CAPACIDAD_PLATAFORMA 256
 
 namespace Constantes{
     const std::string NOMBRE_PROCESO_PLATAFORMA = "control_plataforma";
     const std::string NOMBRE_PROCESO_ROBOT_ARMADO = "robot_armado";
     const std::string NOMBRE_PROCESO_ROBOT_DESPACHO = "robot_despacho";
-    const std::string NOMBRE_PROCESO_ROBOT_EMPAQUE = "robot_empaque";
+    const std::string NOMBRE_PROCESO_ROBOT_EMPAQUE = "control_robot_empaque";
     const std::string NOMBRE_PROCESO_CINTA_ENTRADA = "control_cinta_entrada";
-    const std::string NOMBRE_PROCESO_DISPOSITIVO = "dispositivo";
+    const std::string NOMBRE_PROCESO_DISPOSITIVO = "control_dispositivo";
 }
 
 enum EstadoPosicionPlataforma{

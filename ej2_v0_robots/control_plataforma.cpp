@@ -27,7 +27,6 @@ void BuscarYReservarLugar( Robots2::ShmPlataforma* pPlataforma, int nroRobot, co
         if( pPlataforma->EstadoDePosiciones[i] != Robots2::EPP_OCUPADA_SIN_ARMAR )
             continue;
         pPlataforma->EstadoDePosiciones[i] = Robots2::EPP_RESERVADA;
-        pPlataforma->EspaciosOcupados++;
         g_PosicionesReservadas[nroRobot] = i;
         MENSAJE_DEBUG( "Posicion %d reservada por robot %d, espacios ocupados/reservados: %d/%d",
                        i, nroRobot, pPlataforma->EspaciosOcupados, capacidad );

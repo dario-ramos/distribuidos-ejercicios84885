@@ -9,7 +9,7 @@ using namespace Utils;
 using std::string;
 
 //Para no repetir el primer parametro en cada llamada
-#define MENSAJE_DEBUG(fmt, ...)  MensajeDebug( m_NombreProceso, m_ColorMensajes, fmt, ##__VA_ARGS__ )
+#define MENSAJE_DEBUG(fmt, ...)  MensajeDebug( m_NombreProceso, Utils::AMARILLO, fmt, ##__VA_ARGS__ )
 #define MENSAJE_ERROR(fmt, ...)  MensajeError( m_NombreProceso, fmt, ##__VA_ARGS__ )
 
 Dispositivo::Dispositivo( int id, const Configuracion& config, const string& nombreProceso ):
@@ -65,7 +65,7 @@ void Dispositivo::EsperarFinArmado(){
         exit( 5 );
     }
     if( msj.Msg != Robots2::MensajesDispositivo::FINALIZAR_ARMADO ){
-        MENSAJE_ERROR( "Se esperaba un mensaje de Fin de armado pero llego otro" );
+        MENSAJE_ERROR( "Se esperaba un mensaje de Fin de armado pero llego otro (%d)", msj.Msg );
         exit( 5 );
     }
 }

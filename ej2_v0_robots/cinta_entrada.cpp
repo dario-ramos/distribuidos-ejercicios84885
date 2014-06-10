@@ -22,22 +22,22 @@ CintaEntrada::CintaEntrada( const Configuracion& config, const std::string& nomb
     int idShmPlataforma = config.ObtenerIdShmPlataforma();
     int handleShmPlataforma = shmget( ftok(config.ObtenerDirFtok().c_str(),idShmPlataforma),
                                       sizeof(m_pShm), IPC_CREAT | 0660 );
-	if( handleShmPlataforma == -1 ){
-		MENSAJE_ERROR( "Error al acceder a la Shared Memory de la Plataforma, id %d", idShmPlataforma );
-		exit(1);
-	}
-	m_pShm = static_cast<Robots2::ShmPlataforma*>( shmat(handleShmPlataforma, 0, 0) );
-	if( m_pShm == reinterpret_cast<Robots2::ShmPlataforma*>(-1) ){
-		MENSAJE_ERROR( "Error al atachear a Shared Memory de la Plataforma, id %d", idShmPlataforma );
-		exit(1);
-	}
+    if( handleShmPlataforma == -1 ){
+        MENSAJE_ERROR( "Error al acceder a la Shared Memory de la Plataforma, id %d", idShmPlataforma );
+        exit(1);
+    }
+    m_pShm = static_cast<Robots2::ShmPlataforma*>( shmat(handleShmPlataforma, 0, 0) );
+    if( m_pShm == reinterpret_cast<Robots2::ShmPlataforma*>(-1) ){
+        MENSAJE_ERROR( "Error al atachear a Shared Memory de la Plataforma, id %d", idShmPlataforma );
+        exit(1);
+    }
 }
 
 CintaEntrada::~CintaEntrada(){
-    if( shmdt(m_pShm) == -1 ){
+    /*if( shmdt(m_pShm) == -1 ){
         MENSAJE_ERROR( "Error al detachear Shared Memory de la Plataforma" );
-		exit(1);
-    }
+        exit(1);
+    }*/
 }
 
 void CintaEntrada::LanzarProcesoDispositivo( int iDisp ){
@@ -77,7 +77,7 @@ void CintaEntrada::GenerarDispositivo( int idDispositivo, int tipoDispositivo ){
         MENSAJE_DEBUG( "Dispositivo %d colocado en posicion %d, espacios ocupados: %d/%d",
                        idDispositivo, i, m_pShm->EspaciosOcupados, capacidad );
         break;
-    }
+    }  
     //Lanzar proceso dispositivo
     LanzarProcesoDispositivo( idDispositivo );
     m_pMutex->V();
