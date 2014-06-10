@@ -67,6 +67,5 @@ namespace Utils{
                                 FOOTER_COLOR_VT100;
         write( fileno(stderr), mensaje.c_str(), mensaje.length() );
         va_end(args);
-    }  
-
+    }
 }

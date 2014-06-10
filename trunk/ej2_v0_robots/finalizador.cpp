@@ -94,7 +94,7 @@ void LiberarCola( const string& dirFtok, int idCola ){
 }
 
 void LiberarColas( const string& dirFtok, int idBase, int nColas ){
-    for( int i=0; i<nColas; i++ ){
+    for( int i=1; i<=nColas; i++ ){
         LiberarCola( dirFtok, idBase + i );
     }
 }
