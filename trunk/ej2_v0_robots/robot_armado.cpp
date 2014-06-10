@@ -39,7 +39,7 @@ void ArmarDispositivo( IPlataformaArmado* pPlataforma,
 }
 
 int main( int argc, char** argv ){
-    const int DEMORA_PLATAFORMA_VACIA = 1;
+    const int DEMORA_PLATAFORMA_VACIA = 5;
     ValidarArgumentos( argc, argv );
     int numRobot = atoi( argv[1] );
     string nombreProceso = Robots2::Constantes::NOMBRE_PROCESO_ROBOT_ARMADO + string( argv[1] );

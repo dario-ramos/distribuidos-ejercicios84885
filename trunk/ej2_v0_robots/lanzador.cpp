@@ -31,14 +31,15 @@ void LanzarProcesosDePlataforma( int cantRobots ){
     }
 }
 
-void InicializarSemaforo( const int idSem, const string& dirFtok, const int valorInicial ){
+void InicializarSemaforo( const int idSem, const string& dirFtok,
+                          const int valorInicial, const string& duenio ){
     int clave = ftok(dirFtok.c_str(),idSem);
     t_sem sem( clave );
     if( !sem.Existe() ){
-        MENSAJE_ERROR("Error al crear Semaforo %d", idSem);
+        MENSAJE_ERROR( "Error al crear Semaforo %d para %s", idSem, duenio.c_str() );
         exit(1);
     }else{
-        MENSAJE_DEBUG("Semaforo %d creado exitosamente con clave %d", idSem, clave);
+        MENSAJE_DEBUG("Semaforo %d creado exitosamente con clave %d para %s", idSem, clave, duenio.c_str());
     }
     sem.Inicializar(valorInicial);
 }
@@ -46,12 +47,15 @@ void InicializarSemaforo( const int idSem, const string& dirFtok, const int valo
 void InicializarSemaforosRobots( const Configuracion& config ){
     string dirFtok = config.ObtenerDirFtok();
     for( int i=0; i<config.ObtenerCantidadRobots(); i++ ){
-        InicializarSemaforo( config.ObtenerIdSemaforoRobotArmado( i ), dirFtok, 1 );
-        InicializarSemaforo( config.ObtenerIdSemaforoRobotDespacho( i ), dirFtok, 1 );
+        InicializarSemaforo( config.ObtenerIdSemaforoRobotArmado( i ), dirFtok,
+                             1, "RobotArmado" + std::to_string(i) );
+        InicializarSemaforo( config.ObtenerIdSemaforoRobotDespacho( i ), dirFtok,
+                             1, "RobotDespacho" + std::to_string(i) );
     }
 }
 
-void InicializarSharedMemory( const string& dirFtok, const Configuracion& config ){
+void InicializarSharedMemory( const string& dirFtok, const Configuracion& config,
+                              const string& duenio ){
     int idShmPlataforma = config.ObtenerIdShmPlataforma();
     key_t clave = ftok( dirFtok.c_str(), idShmPlataforma );
     Robots2::ShmPlataforma* pShmPlataforma = 0;
@@ -63,17 +67,17 @@ void InicializarSharedMemory( const string& dirFtok, const Configuracion& config
     }
     int handleShmPlataforma = shmget( clave, sizeof( pShmPlataforma ), IPC_CREAT | IPC_EXCL | 0660 );
     if( handleShmPlataforma == -1 ){
-        MENSAJE_ERROR("Error al crear la Shared Memory con id %d", idShmPlataforma);
+        MENSAJE_ERROR("Error al crear la Shared Memory con id %d para %s", idShmPlataforma, duenio.c_str() );
         exit(1);
     }else{
-        MENSAJE_DEBUG( "Shared Memory creada exitosamente con id %d", idShmPlataforma );
+        MENSAJE_DEBUG( "Shared Memory creada exitosamente con id %d para %s", idShmPlataforma, duenio.c_str() );
     }
     pShmPlataforma = static_cast<Robots2::ShmPlataforma*>( shmat( handleShmPlataforma, 0, 0 ) );
     if( pShmPlataforma == reinterpret_cast<Robots2::ShmPlataforma*>(-1) ){
-        MENSAJE_ERROR( "Error en attach de Shared Memory" );
+        MENSAJE_ERROR( "Error en attach de Shared Memory para %s", duenio.c_str() );
         exit(1);
     }else{
-        MENSAJE_DEBUG( "Shared Memory %d attacheada exitosamente", idShmPlataforma );
+        MENSAJE_DEBUG( "Shared Memory %d attacheada exitosamente para %s", idShmPlataforma, duenio.c_str() );
     }
     pShmPlataforma->Capacidad = capacidad;
     pShmPlataforma->EspaciosOcupados = 0;
@@ -145,20 +149,20 @@ void LanzarProcesoCintaEntrada(){
     }
 }
 
-void InicializarCola( const std::string& dirFtok, int idCola ){
+void InicializarCola( const std::string& dirFtok, int idCola, const string& duenio ){
     key_t clave = ftok( dirFtok.c_str(), idCola );
     int handleCola = msgget( clave, IPC_CREAT | IPC_EXCL | 0660 );
     if( handleCola == -1 ){
-        MENSAJE_ERROR("Lanzador: Error al crear Cola %d", idCola);
+        MENSAJE_ERROR("Lanzador: Error al crear Cola %d para %s", idCola, duenio.c_str() );
         exit(1);
     }else{
-        MENSAJE_DEBUG( "Cola %d creada exitosamente", idCola );
+        MENSAJE_DEBUG( "Cola %d creada exitosamente para %s", idCola, duenio.c_str() );
     }
 }
 
-void InicializarColas( const std::string& dirFtok, int idBase, int nColas ){
-    for( int i=0; i<nColas; i++ )
-      InicializarCola( dirFtok, idBase + i );
+void InicializarColas( const std::string& dirFtok, int idBase, int nColas, const string& duenio ){
+    for( int i=1; i<=nColas; i++ )
+      InicializarCola( dirFtok, idBase + i, duenio + std::to_string(i) );
 }
 
 int main( int argc, char** argv ){
@@ -180,19 +184,20 @@ int main( int argc, char** argv ){
         MENSAJE_ERROR( "No existe el directorio de ftok %s", dirFtok.c_str() );
         exit(-1);
     }
-    InicializarSharedMemory( dirFtok, config );
-    InicializarSemaforo( config.ObtenerIdSemaforoCinta(), dirFtok, 0 );
-    InicializarSemaforo( config.ObtenerIdMutexPlataforma(), dirFtok, 1 );
+    InicializarSharedMemory( dirFtok, config, "Plataforma" );
+    InicializarSemaforo( config.ObtenerIdSemaforoCinta(), dirFtok, 0, "Plataforma" );
+    InicializarSemaforo( config.ObtenerIdMutexPlataforma(), dirFtok, 1, "MutexPlataforma" );
     InicializarSemaforosRobots( config );
-    InicializarCola( dirFtok, config.ObtenerIdColaPlataforma() );
+    InicializarCola( dirFtok, config.ObtenerIdColaPlataforma(), "Plataforma" );
+    int cantTiposDispositivo = config.ObtenerCantidadTiposDeDispositivo();
+    InicializarColas( dirFtok, config.ObtenerIdBaseColasRobotsEmpaque(),
+                      cantTiposDispositivo, "RobotEmpaque" );
+    InicializarColas( dirFtok, config.ObtenerIdBaseColasDispositivos(),
+                      config.ObtenerCantMaxDispositivos(), "Dispositivo" );
     int cantRobots = config.ObtenerCantidadRobots();
     LanzarProcesosDePlataforma( cantRobots );
-    LanzarProcesosDeRobotsDeArmadoYDespacho( cantRobots );
-    InicializarColas( dirFtok, config.ObtenerIdBaseColasRobotsEmpaque(),
-                      config.ObtenerCantMaxDispositivos() );
-    LanzarProcesosDeRobotsEmpacadores( config.ObtenerCantidadTiposDeDispositivo() );
-    InicializarColas( dirFtok, config.ObtenerIdBaseColasDispositivos(),
-                      config.ObtenerCantMaxDispositivos() );
+    LanzarProcesosDeRobotsDeArmadoYDespacho( cantRobots );    
+    LanzarProcesosDeRobotsEmpacadores( cantTiposDispositivo );    
     LanzarProcesoCintaEntrada();
     MENSAJE_DEBUG("PROCESO FINALIZADO");
     return 0;
