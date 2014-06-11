@@ -43,7 +43,7 @@ int main( int argc, char** argv ){
       pDisp->EsperarFinArmado();
       MENSAJE_DEBUG( "Armado finalizando. Activando..." );
       pDisp->Activar();
-      MENSAJE_DEBUG( "Activacion completa. Esperando espacho..." );
+      MENSAJE_DEBUG( "Activacion completa. Esperando despacho..." );
       int idRobotDespacho = pDisp->EsperarDespacho();
       MENSAJE_DEBUG( "Despachado por robot %d. Esperando empaque...", idRobotDespacho );
       int idRobotEmpaque = pDisp->EsperarEmpaque();

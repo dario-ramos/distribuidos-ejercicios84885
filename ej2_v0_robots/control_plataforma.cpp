@@ -40,7 +40,7 @@ void ProcesarMensajePreguntaHayDispositivosParaArmar( Robots2::ShmPlataforma* pP
                                                       int idCola,
                                                       const string& nombreProceso, 
                                                       int nRobot ){
-    MENSAJE_DEBUG( "Mensaje PREGUNTA_PLATAFORMA_VACIA recibido, procesando..." );
+    //MENSAJE_DEBUG( "Mensaje PREGUNTA_HAY_DISPOSITIVOS_SIN_ARMAR recibido, procesando..." );
     mutex.P();
     bool hay = (pPlataforma->DispositivosSinArmar > 0);
     Robots2::MensajeColaPlataforma rta = {
@@ -63,16 +63,16 @@ void ProcesarMensajeIniciarArmado( Robots2::ShmPlataforma* pPlataforma,
                                    std::vector< std::unique_ptr<t_sem> >& semaforosArmado,
                                    std::vector< std::unique_ptr<t_sem> >& semaforosDespacho,
                                    const string& nombreProceso, int nRobot ){
-    MENSAJE_DEBUG( "Mensaje INICIAR_ARMADO recibido, esperando que robot despacho %d este libre...",
-                   nRobot );
+    //MENSAJE_DEBUG( "Mensaje INICIAR_ARMADO recibido, esperando que robot despacho %d este libre...",
+    //               nRobot );
     t_sem* pSem = semaforosDespacho[ nRobot - 1 ].get();
     if( pSem->P() != 0){
         MENSAJE_ERROR( "Error en P de semaforosDespacho" );
         exit( 1 );
     }
-    MENSAJE_DEBUG( "Tomando mutex de armado para robot %d...", nRobot );
+    //MENSAJE_DEBUG( "Tomando mutex de armado para robot %d...", nRobot );
     semaforosArmado[ nRobot - 1 ]->P();
-    MENSAJE_DEBUG( "Mutex de armado para robot %d tomado", nRobot );
+    //MENSAJE_DEBUG( "Mutex de armado para robot %d tomado", nRobot );
     //Obtener id de dispositivo a armar
     int idDisp = -1;
     mutex.P();
@@ -105,31 +105,32 @@ void ProcesarMensajeFinalizarArmado( Robots2::ShmPlataforma* pPlataforma,
     mutex.P();
     semaforosArmado[nroRobot - 1]->V();
     semaforosDespacho[nroRobot - 1]->V();
-    MENSAJE_DEBUG( "¡Mutex de armado para robot %d liberado!", nroRobot );
+    //MENSAJE_DEBUG( "¡Mutex de armado para robot %d liberado!", nroRobot );
     int posDisp = g_PosicionesReservadas[nroRobot];    
     pPlataforma->EstadoDePosiciones[ posDisp ] = Robots2::EPP_OCUPADA_INACTIVA;
     int idDisp = pPlataforma->Dispositivos[posDisp];
     mutex.V();
     std::unique_ptr<IDispositivo> pDispositivo( new Dispositivo(idDisp, config, nombreProceso) );
-    MENSAJE_DEBUG( "Esperando activacion de dispositivo en posicion %d...", posDisp );
+    //MENSAJE_DEBUG( "Esperando activacion de dispositivo en posicion %d...", posDisp );
     pDispositivo->EsperarFinActivacion();
     mutex.P();
     pPlataforma->EstadoDePosiciones[posDisp] = Robots2::EPP_OCUPADA_ACTIVA;
     mutex.V();
-    MENSAJE_DEBUG( "¡Dispositivo en posicion %d activado!", g_PosicionesReservadas[nroRobot] );
+    MENSAJE_DEBUG( "¡Dispositivo %d en posicion %d activado!", idDisp, g_PosicionesReservadas[nroRobot] );
     //Seleccionar robot que despachara disp
     int posEnSet = rand() % g_RobotsDetectandoFrecuencias.size();
     std::set<int>::const_iterator it( g_RobotsDetectandoFrecuencias.begin() );
     advance( it, posEnSet );
     int robotQueDetectaFrecuencia = *it;
-    //En este mensaje se usa el campo NroRobot para enviar la posicion del disp TODO <REF>
-    int posDispActivado = nroRobot;
-    MENSAJE_DEBUG( "Robot %d detecto frecuencia de dispositivo en posicion %d", robotQueDetectaFrecuencia, posDispActivado );
-    MENSAJE_DEBUG( "Esperando que robot %d este libre para comenzar despacho", robotQueDetectaFrecuencia );
+    MENSAJE_DEBUG( "Robot %d detecto frecuencia de dispositivo %d en posicion %d",
+                   robotQueDetectaFrecuencia, idDisp, posDisp );
+    //MENSAJE_DEBUG( "Esperando que robot %d este libre para comenzar despacho", robotQueDetectaFrecuencia );
     semaforosArmado[robotQueDetectaFrecuencia - 1]->P();
     semaforosDespacho[robotQueDetectaFrecuencia - 1]->P();
     Robots2::MensajeColaPlataforma mensaje = {
-    Robots2::TipoMensajes::RespuestaARobotDespacho(robotQueDetectaFrecuencia), robotQueDetectaFrecuencia, posDispActivado };
+        Robots2::TipoMensajes::RespuestaARobotDespacho(robotQueDetectaFrecuencia), //Tipo
+        robotQueDetectaFrecuencia,                                                 //Msg
+        posDisp };                                                                 //DatoMsg
     int codError = msgsnd( idCola, &mensaje, sizeof(mensaje) - sizeof(long), 0 );
     if( codError == -1 ){
         MENSAJE_ERROR( "Error al enviar RESPUESTA_PLATAFORMA - frecuencia detectada " );
@@ -146,7 +147,8 @@ void ProcesarMensajeDespacharDispositivo( Robots2::ShmPlataforma* pPlataforma,
                                           int nroRobot, int posDisp,
                                           const std::vector< std::unique_ptr<IRobotEmpaque> >& robotsEmpaque ){
     mutex.P();
-    MENSAJE_DEBUG( "Robot %d despachando disp en pos %d", nroRobot, posDisp );
+    int idDisp = pPlataforma->Dispositivos[posDisp];
+    MENSAJE_DEBUG( "Robot %d despachando disp %d en pos %d", nroRobot, idDisp, posDisp );
     pPlataforma->EstadoDePosiciones[ posDisp ] = Robots2::EPP_LIBRE;
     pPlataforma->EspaciosOcupados--;
     //Si la plataforma estaba llena, destrabar cinta entrada
@@ -155,8 +157,7 @@ void ProcesarMensajeDespacharDispositivo( Robots2::ShmPlataforma* pPlataforma,
     MENSAJE_DEBUG( "¡Dispositivo de posicion %d despachado! Espacios ocupados: %d/%d", posDisp,
                     pPlataforma->EspaciosOcupados, pPlataforma->Capacidad );
     semaforosArmado[nroRobot - 1]->V();
-    semaforosDespacho[nroRobot - 1]->V();
-    int idDisp = pPlataforma->Dispositivos[posDisp];
+    semaforosDespacho[nroRobot - 1]->V();    
     int tipoDisp = pPlataforma->TipoDispositivo[posDisp];
     std::unique_ptr<IDispositivo> pDispositivo( new Dispositivo(idDisp, config, nombreProceso) );
     pPlataforma->Dispositivos[posDisp] = -1;
