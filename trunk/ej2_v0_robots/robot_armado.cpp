@@ -53,7 +53,7 @@ int main( int argc, char** argv ){
     std::unique_ptr<IPlataformaArmado> pPlataforma( new Plataforma( config, nombreProceso, Utils::MAGENTA ) );
     int nPilas = config.ObtenerCantidadInicialPilas();
     while( nPilas > 1 ){
-        MENSAJE_DEBUG( "Preguntando si hay dispositivos para armar" );
+        //MENSAJE_DEBUG( "Preguntando si hay dispositivos para armar" );
         if( !pPlataforma->HayDispositivosParaArmar( numRobot ) ){
             sleep( DEMORA_NO_HAY_DISPOSITIVOS_PARA_ARMAR );
             continue;

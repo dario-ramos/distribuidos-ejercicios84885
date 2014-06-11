@@ -36,7 +36,7 @@ bool Plataforma::HayDispositivosParaArmar( int numeroRobot ) const{
       }
       //Esperar respuesta
       Robots2::MensajeColaPlataforma respuesta;
-      MENSAJE_DEBUG( "Esperando respuesta a PEDIDO_A_PLATAFORMA - PREGUNTA_HAY_DISPOSITIVOS_PARA_ARMAR..." );
+      //MENSAJE_DEBUG( "Esperando respuesta a PEDIDO_A_PLATAFORMA - PREGUNTA_HAY_DISPOSITIVOS_PARA_ARMAR..." );
       codError = msgrcv( m_ColaPlataforma, &respuesta, sizeof(respuesta)-sizeof(long),
                          Robots2::TipoMensajes::RespuestaARobotArmado( numeroRobot ), 0 );
       if( codError == -1 ){
@@ -98,28 +98,28 @@ int Plataforma::DetectarFrecuenciaActivacion( int numeroRobot ){
             MENSAJE_ERROR( "Error al recibir respuesta " );
             exit( 5 );
       }
-      return -1; // respuesta.Msg;
+      return respuesta.DatosMsg; // respuesta.Msg;
 }
 
 void Plataforma::DespacharDispositivo( int numeroRobot, int posDisp ){
-      //Preguntar
-      Robots2::MensajeColaPlataforma pedido = {
-                    Robots2::TipoMensajes::PEDIDO_A_PLATAFORMA, numeroRobot,
-                    Robots2::MensajesPlataforma::PEDIDO_DESPACHAR_DISPOSITIVO,
-                    posDisp
-      };
-      int codError = msgsnd( m_ColaPlataforma, &pedido, sizeof(pedido), 0 );
-      if( codError == -1 ){
-            MENSAJE_ERROR( "Error al enviar PEDIDO_A_PLATAFORMA - PEDIDO_DESPACHAR_DISPOSITIVO " );
-            exit( 5 );
-      }
-      //Esperar respuesta
-      Robots2::MensajeColaPlataforma respuesta;
-      MENSAJE_DEBUG( "Esperando respuesta a PEDIDO_A_PLATAFORMA - PEDIDO_DESPACHAR_DISPOSITIVO..." );
-      codError = msgrcv( m_ColaPlataforma, &respuesta, sizeof(respuesta),
-                         Robots2::TipoMensajes::RespuestaARobotDespacho( numeroRobot ), 0 );
-      if( codError == -1 ){
-            MENSAJE_ERROR( "Error al recibir respuesta " );
-            exit( 5 );
-      }
+    //Preguntar
+    Robots2::MensajeColaPlataforma pedido = {
+        Robots2::TipoMensajes::PEDIDO_A_PLATAFORMA, numeroRobot,
+        Robots2::MensajesPlataforma::PEDIDO_DESPACHAR_DISPOSITIVO,
+        posDisp
+    };
+    int codError = msgsnd( m_ColaPlataforma, &pedido, sizeof(pedido), 0 );
+    if( codError == -1 ){
+        MENSAJE_ERROR( "Error al enviar PEDIDO_A_PLATAFORMA - PEDIDO_DESPACHAR_DISPOSITIVO " );
+        exit( 5 );
+    }
+    //Esperar respuesta
+    Robots2::MensajeColaPlataforma respuesta;
+    MENSAJE_DEBUG( "Esperando respuesta a PEDIDO_A_PLATAFORMA - PEDIDO_DESPACHAR_DISPOSITIVO..." );
+    codError = msgrcv( m_ColaPlataforma, &respuesta, sizeof(respuesta),
+                       Robots2::TipoMensajes::RespuestaARobotDespacho( numeroRobot ), 0 );
+    if( codError == -1 ){
+        MENSAJE_ERROR( "Error al recibir respuesta " );
+        exit( 5 );
+    }
 }
