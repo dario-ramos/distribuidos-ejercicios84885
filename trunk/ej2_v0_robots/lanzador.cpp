@@ -81,6 +81,7 @@ void InicializarSharedMemory( const string& dirFtok, const Configuracion& config
     }
     pShmPlataforma->Capacidad = capacidad;
     pShmPlataforma->EspaciosOcupados = 0;
+    pShmPlataforma->DispositivosSinArmar = 0;
     for( int i=0; i<capacidad; i++ ){
         pShmPlataforma->EstadoDePosiciones[i] = Robots2::EPP_LIBRE;
         pShmPlataforma->Dispositivos[i] = -1;

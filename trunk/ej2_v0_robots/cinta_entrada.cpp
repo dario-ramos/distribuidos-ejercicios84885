@@ -74,6 +74,7 @@ void CintaEntrada::GenerarDispositivo( int idDispositivo, int tipoDispositivo ){
         m_pShm->Dispositivos[i] = idDispositivo;
         m_pShm->TipoDispositivo[i] = tipoDispositivo;
         m_pShm->EspaciosOcupados++;
+        m_pShm->DispositivosSinArmar++;
         MENSAJE_DEBUG( "Dispositivo %d colocado en posicion %d, espacios ocupados: %d/%d",
                        idDispositivo, i, m_pShm->EspaciosOcupados, capacidad );
         break;

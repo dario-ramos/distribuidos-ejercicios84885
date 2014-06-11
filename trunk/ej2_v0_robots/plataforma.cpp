@@ -24,26 +24,26 @@ Plataforma::Plataforma( const Configuracion& config, const std::string& nombrePr
 
 Plataforma::~Plataforma(){}
 
-bool Plataforma::Vacia( int numeroRobot ) const{
+bool Plataforma::HayDispositivosParaArmar( int numeroRobot ) const{
       //Preguntar
       Robots2::MensajeColaPlataforma pedido = {
                     Robots2::TipoMensajes::PEDIDO_A_PLATAFORMA, numeroRobot,
-                    Robots2::MensajesPlataforma::PREGUNTA_PLATAFORMA_VACIA };
+                    Robots2::MensajesPlataforma::PREGUNTA_HAY_DISPOSITIVOS_PARA_ARMAR };
       int codError = msgsnd( m_ColaPlataforma, &pedido, sizeof(pedido)-sizeof(long), 0 );
       if( codError == -1 ){
-            MENSAJE_ERROR( "Error al enviar PEDIDO_A_PLATAFORMA - PREGUNTA_PLATAFORMA_VACIA " );
+            MENSAJE_ERROR( "Error al enviar PEDIDO_A_PLATAFORMA - PREGUNTA_HAY_DISPOSITIVOS_PARA_ARMAR" );
             exit( 5 );
       }
       //Esperar respuesta
       Robots2::MensajeColaPlataforma respuesta;
-      MENSAJE_DEBUG( "Esperando respuesta a PEDIDO_A_PLATAFORMA - PREGUNTA_PLATAFORMA_VACIA..." );
+      MENSAJE_DEBUG( "Esperando respuesta a PEDIDO_A_PLATAFORMA - PREGUNTA_HAY_DISPOSITIVOS_PARA_ARMAR..." );
       codError = msgrcv( m_ColaPlataforma, &respuesta, sizeof(respuesta)-sizeof(long),
                          Robots2::TipoMensajes::RespuestaARobotArmado( numeroRobot ), 0 );
       if( codError == -1 ){
             MENSAJE_ERROR( "Error al recibir respuesta " );
             exit( 5 );
       }
-      return (respuesta.Msg == Robots2::MensajesPlataforma::RESPUESTA_PLATAFORMA_VACIA_SI);
+      return (respuesta.Msg == Robots2::MensajesPlataforma::RESPUESTA_HAY_DISPOSITIVOS_PARA_ARMAR_SI);
 }
 
 int Plataforma::IniciarArmado( int numeroRobot ){

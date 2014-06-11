@@ -30,7 +30,7 @@ int Dispositivo::EsperarInicioArmado(){
     //Esperar mensaje de inicio de armado
     Robots2::MensajeColaDispositivo msj;
     int codError = msgrcv( m_Cola, &msj, sizeof(msj)-sizeof(long),
-                       Robots2::TipoMensajes::MensajeColaDispositivo( m_Id ), 0 );
+                           Robots2::TipoMensajes::MensajeColaDispositivo( m_Id ), 0 );
     if( codError == -1 ){
         MENSAJE_ERROR( "Error al recibir mensaje de Inicio de Armado" );
         exit( 5 );

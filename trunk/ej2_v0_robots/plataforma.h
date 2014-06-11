@@ -12,7 +12,7 @@ class Plataforma : public IPlataformaArmado, public IPlataformaDespacho{
 public:
     Plataforma( const Configuracion& config, const std::string& nombreProceso, int colorMensajes );
     virtual ~Plataforma();
-    virtual bool Vacia( int numeroRobot ) const;
+    virtual bool HayDispositivosParaArmar( int numeroRobot ) const;
     virtual int DetectarFrecuenciaActivacion( int numeroRobot );
     virtual int IniciarArmado( int numeroRobot );
     virtual void DespacharDispositivo( int numeroRobot, int posDisp );
