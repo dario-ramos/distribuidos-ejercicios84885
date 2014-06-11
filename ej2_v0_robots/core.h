@@ -26,6 +26,7 @@ enum EstadoPosicionPlataforma{
 
 struct ShmPlataforma{
       int Capacidad;
+      int DispositivosSinArmar;
       int EspaciosOcupados;
       EstadoPosicionPlataforma EstadoDePosiciones[MAX_CAPACIDAD_PLATAFORMA];
       int Dispositivos[MAX_CAPACIDAD_PLATAFORMA];
@@ -53,9 +54,9 @@ typedef struct{
 } MensajeColaRobotEmpaque;
 
 namespace MensajesPlataforma{
-    const int PREGUNTA_PLATAFORMA_VACIA = 5001;
-    const int RESPUESTA_PLATAFORMA_VACIA_NO = 5002;
-    const int RESPUESTA_PLATAFORMA_VACIA_SI = 5003;
+    const int PREGUNTA_HAY_DISPOSITIVOS_PARA_ARMAR = 5001;
+    const int RESPUESTA_HAY_DISPOSITIVOS_PARA_ARMAR_NO = 5002;
+    const int RESPUESTA_HAY_DISPOSITIVOS_PARA_ARMAR_SI = 5003;
     const int PEDIDO_INICIAR_ARMADO = 5004;
     const int RESPUESTA_INICIAR_ARMADO = 5005;
     const int PEDIDO_FINALIZAR_ARMADO = 5006;
@@ -88,7 +89,7 @@ typedef struct{
         if( Tipo == TipoMensajes::PEDIDO_A_PLATAFORMA ){
             s = "PEDIDO_A_PLATAFORMA-";
             switch( Msg ){
-                case MensajesPlataforma::PREGUNTA_PLATAFORMA_VACIA: return s + "PREGUNTA_PLATAFORMA_VACIA";
+                case MensajesPlataforma::PREGUNTA_HAY_DISPOSITIVOS_PARA_ARMAR: return s + "PREGUNTA_HAY_DISPOSITIVOS_PARA_ARMAR";
                 case MensajesPlataforma::PEDIDO_INICIAR_ARMADO: return s + "PEDIDO_INICIAR_ARMADO";
                 case MensajesPlataforma::PEDIDO_FINALIZAR_ARMADO: return s + "PEDIDO_FINALIZAR_ARMADO";
                 case MensajesPlataforma::PEDIDO_DETECTAR_FRECUENCIA: return s + "PEDIDO_DETECTAR_FRECUENCIA";
@@ -99,8 +100,8 @@ typedef struct{
         }else if( Tipo < 12000 ){
             s = "RESPUESTA_A_ROBOT_ARMADO-";
             switch( Msg ){
-               case MensajesPlataforma::RESPUESTA_PLATAFORMA_VACIA_NO: return s + "RESPUESTA_PLATAFORMA_VACIA_NO";
-               case MensajesPlataforma::RESPUESTA_PLATAFORMA_VACIA_SI: return s + "RESPUESTA_PLATAFORMA_VACIA_SI";
+               case MensajesPlataforma::RESPUESTA_HAY_DISPOSITIVOS_PARA_ARMAR_NO: return s + "RESPUESTA_HAY_DISPOSITIVOS_PARA_ARMAR_NO";
+               case MensajesPlataforma::RESPUESTA_HAY_DISPOSITIVOS_PARA_ARMAR_SI: return s + "RESPUESTA_HAY_DISPOSITIVOS_PARA_ARMAR_SI";
                case MensajesPlataforma::RESPUESTA_INICIAR_ARMADO: return s + "RESPUESTA_INICIAR_ARMADO";
                default: return s + "NO_TIPADA";
             }

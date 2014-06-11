@@ -39,7 +39,7 @@ void ArmarDispositivo( IPlataformaArmado* pPlataforma,
 }
 
 int main( int argc, char** argv ){
-    const int DEMORA_PLATAFORMA_VACIA = 5;
+    const int DEMORA_NO_HAY_DISPOSITIVOS_PARA_ARMAR = 5;
     ValidarArgumentos( argc, argv );
     int numRobot = atoi( argv[1] );
     string nombreProceso = Robots2::Constantes::NOMBRE_PROCESO_ROBOT_ARMADO + string( argv[1] );
@@ -53,9 +53,9 @@ int main( int argc, char** argv ){
     std::unique_ptr<IPlataformaArmado> pPlataforma( new Plataforma( config, nombreProceso, Utils::MAGENTA ) );
     int nPilas = config.ObtenerCantidadInicialPilas();
     while( nPilas > 1 ){
-        MENSAJE_DEBUG( "Preguntando si plataforma vacia" );
-        if( pPlataforma->Vacia( numRobot ) ){
-            sleep( DEMORA_PLATAFORMA_VACIA );
+        MENSAJE_DEBUG( "Preguntando si hay dispositivos para armar" );
+        if( !pPlataforma->HayDispositivosParaArmar( numRobot ) ){
+            sleep( DEMORA_NO_HAY_DISPOSITIVOS_PARA_ARMAR );
             continue;
         }
         ArmarDispositivo( pPlataforma.get(), &nPilas,

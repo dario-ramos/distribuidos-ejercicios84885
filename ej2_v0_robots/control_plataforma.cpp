@@ -27,6 +27,7 @@ void BuscarYReservarLugar( Robots2::ShmPlataforma* pPlataforma, int nroRobot, co
         if( pPlataforma->EstadoDePosiciones[i] != Robots2::EPP_OCUPADA_SIN_ARMAR )
             continue;
         pPlataforma->EstadoDePosiciones[i] = Robots2::EPP_RESERVADA;
+        pPlataforma->DispositivosSinArmar--;
         g_PosicionesReservadas[nroRobot] = i;
         MENSAJE_DEBUG( "Posicion %d reservada por robot %d, espacios ocupados/reservados: %d/%d",
                        i, nroRobot, pPlataforma->EspaciosOcupados, capacidad );
@@ -34,23 +35,23 @@ void BuscarYReservarLugar( Robots2::ShmPlataforma* pPlataforma, int nroRobot, co
     }
 }
 
-void ProcesarMensajePreguntaPlataformaVacia( Robots2::ShmPlataforma* pPlataforma,
-                                             t_sem& mutex,
-                                             int idCola,
-                                             const string& nombreProceso, 
-                                             int nRobot ){
+void ProcesarMensajePreguntaHayDispositivosParaArmar( Robots2::ShmPlataforma* pPlataforma,
+                                                      t_sem& mutex,
+                                                      int idCola,
+                                                      const string& nombreProceso, 
+                                                      int nRobot ){
     MENSAJE_DEBUG( "Mensaje PREGUNTA_PLATAFORMA_VACIA recibido, procesando..." );
     mutex.P();
-    bool vacia = (pPlataforma->EspaciosOcupados == 0);
+    bool hay = (pPlataforma->DispositivosSinArmar > 0);
     Robots2::MensajeColaPlataforma rta = {
         Robots2::TipoMensajes::RespuestaARobotArmado(nRobot), nRobot,
-        vacia? Robots2::MensajesPlataforma::RESPUESTA_PLATAFORMA_VACIA_SI :
-               Robots2::MensajesPlataforma::RESPUESTA_PLATAFORMA_VACIA_NO };
-    if( !vacia )
+        hay? Robots2::MensajesPlataforma::RESPUESTA_HAY_DISPOSITIVOS_PARA_ARMAR_SI :
+             Robots2::MensajesPlataforma::RESPUESTA_HAY_DISPOSITIVOS_PARA_ARMAR_NO };
+    if( hay )
         BuscarYReservarLugar( pPlataforma, nRobot, nombreProceso );
     int codError = msgsnd( idCola, &rta, sizeof(rta) - sizeof(long), 0 );
     if( codError == -1 ){
-        MENSAJE_ERROR( "Error al enviar RESPUESTA_PLATAFORMA - PREGUNTA_PLATAFORMA_LLENA" );
+        MENSAJE_ERROR( "Error al enviar RESPUESTA_PLATAFORMA - PREGUNTA_HAY_DISPOSITIVOS_SIN_ARMAR" );
         exit( 5 );
     }
     mutex.V();
@@ -177,8 +178,8 @@ void ProcesarMensaje( Robots2::ShmPlataforma* pPlataforma,
     //MENSAJE_DEBUG( "Procesando pedido %s", pedido.ToString().c_str() );
     //MensajeDebug( nombreProceso, Utils::VERDE, "Procesando pedido %s de robot %d", pedido.ToString().c_str(), pedido.NroRobot );
     switch( pedido.Msg ){
-        case Robots2::MensajesPlataforma::PREGUNTA_PLATAFORMA_VACIA:
-            ProcesarMensajePreguntaPlataformaVacia( pPlataforma, mutex, idCola, nombreProceso, pedido.NroRobot );
+        case Robots2::MensajesPlataforma::PREGUNTA_HAY_DISPOSITIVOS_PARA_ARMAR:
+            ProcesarMensajePreguntaHayDispositivosParaArmar( pPlataforma, mutex, idCola, nombreProceso, pedido.NroRobot );
             break;
         case Robots2::MensajesPlataforma::PEDIDO_INICIAR_ARMADO:
             ProcesarMensajeIniciarArmado( pPlataforma, mutex, idCola, semaforosArmado, semaforosDespacho,
