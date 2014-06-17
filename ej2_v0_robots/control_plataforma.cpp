@@ -17,9 +17,6 @@ using std::string;
 #define MENSAJE_DEBUG(fmt, ...)  MensajeDebug( nombreProceso, Utils::AMARILLO, fmt, ##__VA_ARGS__ )
 #define MENSAJE_ERROR(fmt, ...)  MensajeError( nombreProceso, fmt, ##__VA_ARGS__ )
 
-std::map<int,int> g_PosicionesReservadas; //Clave: numRobot, valor: posicionArmado
-std::set<int>     g_RobotsDetectandoFrecuencias;
-
 //Por ahora, se toma el primer dispositivo encontrado
 void BuscarYReservarLugar( Robots2::ShmPlataforma* pPlataforma, int nroRobot, const std::string& nombreProceso ){
     int capacidad = pPlataforma->Capacidad;
@@ -28,7 +25,7 @@ void BuscarYReservarLugar( Robots2::ShmPlataforma* pPlataforma, int nroRobot, co
             continue;
         pPlataforma->EstadoDePosiciones[i] = Robots2::EPP_RESERVADA;
         pPlataforma->DispositivosSinArmar--;
-        g_PosicionesReservadas[nroRobot] = i;
+        pPlataforma->PosicionesReservadas[nroRobot-1] = i;
         MENSAJE_DEBUG( "Posicion %d reservada por robot %d, espacios ocupados/reservados: %d/%d",
                        i, nroRobot, pPlataforma->EspaciosOcupados, capacidad );
         break;
@@ -76,7 +73,7 @@ void ProcesarMensajeIniciarArmado( Robots2::ShmPlataforma* pPlataforma,
     //Obtener id de dispositivo a armar
     int idDisp = -1;
     mutex.P();
-    int posDisp = g_PosicionesReservadas[nRobot];
+    int posDisp = pPlataforma->PosicionesReservadas[nRobot-1];
     idDisp = pPlataforma->Dispositivos[posDisp];
     mutex.V();
     //Enviar mensaje a robot armado incluyendo id disp
@@ -106,7 +103,7 @@ void ProcesarMensajeFinalizarArmado( Robots2::ShmPlataforma* pPlataforma,
     semaforosArmado[nroRobot - 1]->V();
     semaforosDespacho[nroRobot - 1]->V();
     //MENSAJE_DEBUG( "¡Mutex de armado para robot %d liberado!", nroRobot );
-    int posDisp = g_PosicionesReservadas[nroRobot];    
+    int posDisp = pPlataforma->PosicionesReservadas[nroRobot-1];
     pPlataforma->EstadoDePosiciones[ posDisp ] = Robots2::EPP_OCUPADA_INACTIVA;
     int idDisp = pPlataforma->Dispositivos[posDisp];
     mutex.V();
@@ -116,12 +113,14 @@ void ProcesarMensajeFinalizarArmado( Robots2::ShmPlataforma* pPlataforma,
     mutex.P();
     pPlataforma->EstadoDePosiciones[posDisp] = Robots2::EPP_OCUPADA_ACTIVA;
     mutex.V();
-    MENSAJE_DEBUG( "¡Dispositivo %d en posicion %d activado!", idDisp, g_PosicionesReservadas[nroRobot] );
-    //Seleccionar robot que despachara disp
-    int posEnSet = rand() % g_RobotsDetectandoFrecuencias.size();
-    std::set<int>::const_iterator it( g_RobotsDetectandoFrecuencias.begin() );
-    advance( it, posEnSet );
-    int robotQueDetectaFrecuencia = *it;
+    MENSAJE_DEBUG( "¡Dispositivo %d en posicion %d activado!", idDisp, posDisp );
+    //Seleccionar robot de despacho que detectara la frecuencia de activacion
+    bool robotElegido = false;
+    int robotQueDetectaFrecuencia = -1;
+    while( !robotElegido ){
+        robotQueDetectaFrecuencia = 1 + rand() % config.ObtenerCantidadRobots();
+        robotElegido = (pPlataforma->DetectandoFrecuencia[robotQueDetectaFrecuencia-1] != -1);
+    }
     MENSAJE_DEBUG( "Robot %d detecto frecuencia de dispositivo %d en posicion %d",
                    robotQueDetectaFrecuencia, idDisp, posDisp );
     //MENSAJE_DEBUG( "Esperando que robot %d este libre para comenzar despacho", robotQueDetectaFrecuencia );
@@ -167,6 +166,13 @@ void ProcesarMensajeDespacharDispositivo( Robots2::ShmPlataforma* pPlataforma,
     mutex.V();
 }
 
+void ProcesarMensajeDetectarFrecuencia( Robots2::ShmPlataforma* pPlataforma, t_sem& mutex, const string& nombreProceso, int nroRobot ){
+    mutex.P();
+    pPlataforma->DetectandoFrecuencia[ nroRobot - 1 ] = 1;
+    mutex.V();
+    MENSAJE_DEBUG( "Robot %d detectando frecuencia", nroRobot );
+}
+
 void ProcesarMensaje( Robots2::ShmPlataforma* pPlataforma,
                       t_sem& mutex, t_sem& semCintaEntrada,
                       std::vector< std::unique_ptr<t_sem> >& semaforosArmado,
@@ -191,8 +197,7 @@ void ProcesarMensaje( Robots2::ShmPlataforma* pPlataforma,
                                             config, nombreProceso, pedido.NroRobot );
             break;
         case Robots2::MensajesPlataforma::PEDIDO_DETECTAR_FRECUENCIA:
-            g_RobotsDetectandoFrecuencias.insert( pedido.NroRobot );
-            MENSAJE_DEBUG( "Robot %d detectando frecuencia", pedido.NroRobot );
+            ProcesarMensajeDetectarFrecuencia( pPlataforma, mutex, nombreProceso, pedido.NroRobot );
             break;
         case Robots2::MensajesPlataforma::PEDIDO_DESPACHAR_DISPOSITIVO:
             ProcesarMensajeDespacharDispositivo( pPlataforma, mutex, semCintaEntrada,

@@ -4,6 +4,7 @@
 
 namespace Robots2{
 
+#define MAX_CANT_ROBOTS 10
 #define MAX_CAPACIDAD_PLATAFORMA 256
 
 namespace Constantes{
@@ -31,6 +32,8 @@ struct ShmPlataforma{
       EstadoPosicionPlataforma EstadoDePosiciones[MAX_CAPACIDAD_PLATAFORMA];
       int Dispositivos[MAX_CAPACIDAD_PLATAFORMA];
       int TipoDispositivo[MAX_CAPACIDAD_PLATAFORMA];
+      int DetectandoFrecuencia[MAX_CANT_ROBOTS];
+      int PosicionesReservadas[MAX_CANT_ROBOTS];
 };
 
 namespace MensajesDispositivo{
