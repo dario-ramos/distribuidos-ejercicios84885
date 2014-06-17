@@ -115,3 +115,8 @@ int Configuracion::ObtenerIdColaDispositivo( int idDispositivo ) const{
 int Configuracion::ObtenerIdColaRobotEmpaque( int idRobot ) const{
     return ObtenerIdBaseColasRobotsEmpaque() + idRobot;
 }
+
+std::pair<int,int> Configuracion::ObtenerDemoraGeneracionDispositivo() const{
+    return std::pair<int,int>( std::stoi( ObtenerValorParametro("MinDemoraGeneracionDispositivo") ),
+                               std::stoi( ObtenerValorParametro("MaxDemoraGeneracionDispositivo") ) );
+}

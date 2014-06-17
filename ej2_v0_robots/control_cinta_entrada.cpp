@@ -39,6 +39,8 @@ int main( int argc, char** argv ){
                                                   HayMasDispositivos_N;
     std::unique_ptr<ICintaEntrada> pCinta( new CintaEntrada( config, NOMBRE_PROCESO ) ); 
     for( int iDisp = 1; condicionCorte( iDisp, cantDisp ); iDisp++ ){
+        Random::DemoraAleatoriaEnMilis( config.ObtenerDemoraGeneracionDispositivo() );
+        sleep( 1 );
         int tipoDisp = Random::NumeroAleatorio( 1, config.ObtenerCantidadTiposDeDispositivo() );
         pCinta->GenerarDispositivo( iDisp, tipoDisp );
     }

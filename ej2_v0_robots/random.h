@@ -1,6 +1,7 @@
 #pragma once
 
-#include <cstdlib>
+#include <thread>
+#include <chrono>
 
 namespace Random{
     inline bool BooleanoAleatorio(){
@@ -12,7 +13,7 @@ namespace Random{
     }
 
     inline void DemoraAleatoriaEnMilis( std::pair<int,int> minYMaxMilis ){
-        int demora = minYMaxMilis.first + rand() % ( minYMaxMilis.second - minYMaxMilis.first );
-        usleep( demora * 1000 );
+        int demora = minYMaxMilis.first + rand() % ( std::max( minYMaxMilis.second - minYMaxMilis.first, 1 ) );
+        std::this_thread::sleep_for( std::chrono::milliseconds(demora) );
     }
 }
