@@ -30,6 +30,7 @@ public:
     std::pair<int,int> ObtenerDemoraArmado() const;
     std::pair<int,int> ObtenerDemoraDespacho() const;
     std::pair<int,int> ObtenerDemoraEmpaque() const;
+    std::pair<int,int> ObtenerDemoraGeneracionDispositivo() const;
     std::string ObtenerDirFtok() const;
 };
 
