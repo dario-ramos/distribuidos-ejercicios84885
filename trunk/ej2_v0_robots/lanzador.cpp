@@ -87,6 +87,9 @@ void InicializarSharedMemory( const string& dirFtok, const Configuracion& config
         pShmPlataforma->Dispositivos[i] = -1;
         pShmPlataforma->TipoDispositivo[i] = -1;
     }
+    for( int i=0; i<MAX_CANT_ROBOTS; i++ ){
+        pShmPlataforma->DetectandoFrecuencia[i] = -1;
+    }
     pShmPlataforma->EstadoDePosiciones[capacidad] = Robots2::EPP_FIN_LISTA;
     pShmPlataforma->Dispositivos[capacidad] = 0;
 }
