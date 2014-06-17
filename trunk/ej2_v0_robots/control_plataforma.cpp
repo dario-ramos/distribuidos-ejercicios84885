@@ -255,7 +255,7 @@ int main( int argc, char** argv ){
     while( true ){
         //MENSAJE_DEBUG( "Esperando pedido..." );
         Robots2::MensajeColaPlataforma mensaje;
-        int codError = msgrcv( cola, &mensaje, sizeof(mensaje), Robots2::TipoMensajes::PEDIDO_A_PLATAFORMA, 0 );
+        int codError = msgrcv( cola, &mensaje, sizeof(mensaje)-sizeof(long), Robots2::TipoMensajes::PEDIDO_A_PLATAFORMA, 0 );
         if( codError == -1 ){
             MENSAJE_ERROR( "Error al recibir PEDIDO_A_PLATAFORMA" );
             exit(1);

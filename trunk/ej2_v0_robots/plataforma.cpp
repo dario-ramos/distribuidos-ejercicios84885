@@ -84,7 +84,7 @@ int Plataforma::DetectarFrecuenciaActivacion( int numeroRobot ){
       Robots2::MensajeColaPlataforma pedido = {
                     Robots2::TipoMensajes::PEDIDO_A_PLATAFORMA, numeroRobot,
                     Robots2::MensajesPlataforma::PEDIDO_DETECTAR_FRECUENCIA };
-      int codError = msgsnd( m_ColaPlataforma, &pedido, sizeof(pedido), 0 );
+      int codError = msgsnd( m_ColaPlataforma, &pedido, sizeof(pedido)-sizeof(long), 0 );
       if( codError == -1 ){
             MENSAJE_ERROR( "Error al enviar PEDIDO_A_PLATAFORMA - PEDIDO_DETECTAR_FRECUENCIA " );
             exit( 5 );
@@ -92,7 +92,7 @@ int Plataforma::DetectarFrecuenciaActivacion( int numeroRobot ){
       //Esperar respuesta
       Robots2::MensajeColaPlataforma respuesta;
       MENSAJE_DEBUG( "Esperando respuesta a PEDIDO_A_PLATAFORMA - PEDIDO_DETECTAR_FRECUENCIA..." );
-      codError = msgrcv( m_ColaPlataforma, &respuesta, sizeof(respuesta),
+      codError = msgrcv( m_ColaPlataforma, &respuesta, sizeof(respuesta)-sizeof(long),
                          Robots2::TipoMensajes::RespuestaARobotDespacho( numeroRobot ), 0 );
       if( codError == -1 ){
             MENSAJE_ERROR( "Error al recibir respuesta " );
@@ -108,7 +108,7 @@ void Plataforma::DespacharDispositivo( int numeroRobot, int posDisp ){
         Robots2::MensajesPlataforma::PEDIDO_DESPACHAR_DISPOSITIVO,
         posDisp
     };
-    int codError = msgsnd( m_ColaPlataforma, &pedido, sizeof(pedido), 0 );
+    int codError = msgsnd( m_ColaPlataforma, &pedido, sizeof(pedido)-sizeof(long), 0 );
     if( codError == -1 ){
         MENSAJE_ERROR( "Error al enviar PEDIDO_A_PLATAFORMA - PEDIDO_DESPACHAR_DISPOSITIVO " );
         exit( 5 );
@@ -116,7 +116,7 @@ void Plataforma::DespacharDispositivo( int numeroRobot, int posDisp ){
     //Esperar respuesta
     Robots2::MensajeColaPlataforma respuesta;
     MENSAJE_DEBUG( "Esperando respuesta a PEDIDO_A_PLATAFORMA - PEDIDO_DESPACHAR_DISPOSITIVO..." );
-    codError = msgrcv( m_ColaPlataforma, &respuesta, sizeof(respuesta),
+    codError = msgrcv( m_ColaPlataforma, &respuesta, sizeof(respuesta)-sizeof(long),
                        Robots2::TipoMensajes::RespuestaARobotDespacho( numeroRobot ), 0 );
     if( codError == -1 ){
         MENSAJE_ERROR( "Error al recibir respuesta " );
