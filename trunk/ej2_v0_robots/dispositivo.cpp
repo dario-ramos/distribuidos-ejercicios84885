@@ -29,6 +29,7 @@ Dispositivo::~Dispositivo(){}
 int Dispositivo::EsperarInicioArmado(){
     //Esperar mensaje de inicio de armado
     Robots2::MensajeColaDispositivo msj;
+    //MENSAJE_ERROR( "Esperando mensaje INICIAR_ARMADO en disp %d", m_Id ); //<DBG>
     int codError = msgrcv( m_Cola, &msj, sizeof(msj)-sizeof(long),
                            Robots2::TipoMensajes::MensajeColaDispositivo( m_Id ), 0 );
     if( codError == -1 ){
@@ -48,6 +49,7 @@ void Dispositivo::IniciarArmado( int idRobot ){
         Robots2::MensajesDispositivo::INICIAR_ARMADO,          //Msg
         idRobot                                                //DatosMsg
     };
+    //MENSAJE_ERROR( "Enviando INICIAR_ARMADO de robo %d a disp %d", idRobot, m_Id ); //<DBG>
     int codError = msgsnd( m_Cola, &msj, sizeof(msj)-sizeof(long), 0 );
     if( codError == -1 ){
         MENSAJE_ERROR( "Error al enviar INICIAR_ARMADO " );
@@ -58,6 +60,7 @@ void Dispositivo::IniciarArmado( int idRobot ){
 void Dispositivo::EsperarFinArmado(){
     //Esperar mensaje de fin de armado
     Robots2::MensajeColaDispositivo msj;
+    //MENSAJE_ERROR( "Esperando mensaje FINALIZAR_ARMADO en disp %d", m_Id ); //<DBG>
     int codError = msgrcv( m_Cola, &msj, sizeof(msj)-sizeof(long),
                            Robots2::TipoMensajes::MensajeColaDispositivo( m_Id ), 0 );
     if( codError == -1 ){
@@ -76,6 +79,7 @@ void Dispositivo::FinalizarArmado(){
         Robots2::MensajesDispositivo::FINALIZAR_ARMADO,        //Msg
         -1                                                     //DatosMsg
     };
+    //MENSAJE_ERROR( "Enviando FINALIZAR_ARMADO desde disp %d", m_Id ); //<DBG>
     int codError = msgsnd( m_Cola, &msj, sizeof(msj)-sizeof(long), 0 );
     if( codError == -1 ){
         MENSAJE_ERROR( "Error al enviar FINALIZAR_ARMADO " );
@@ -86,6 +90,7 @@ void Dispositivo::FinalizarArmado(){
 void Dispositivo::EsperarFinActivacion(){
     //Esperar mensaje de fin de activacion
     Robots2::MensajeColaDispositivo msj;
+    //MENSAJE_ERROR( "Esperando mensaje ACTIVACION_FINALIZADA en disp %d", m_Id ); //<DBG>
     int codError = msgrcv( m_Cola, &msj, sizeof(msj)-sizeof(long),
                            Robots2::TipoMensajes::MensajeColaDispositivo( m_Id ), 0 );
     if( codError == -1 ){
@@ -105,6 +110,7 @@ void Dispositivo::Activar(){
         Robots2::MensajesDispositivo::ACTIVACION_FINALIZADA,   //Msg
         -1                                                     //DatosMsg
     };
+    //MENSAJE_ERROR( "Enviando ACTIVACION_FINALIZADA desde disp %d", m_Id ); //<DBG>
     int codError = msgsnd( m_Cola, &msj, sizeof(msj)-sizeof(long), 0 );
     if( codError == -1 ){
         MENSAJE_ERROR( "Error al enviar ACTIVACION_FINALIZADA " );
@@ -115,6 +121,7 @@ void Dispositivo::Activar(){
 int Dispositivo::EsperarDespacho(){
     //Esperar mensaje de fin de despacho
     Robots2::MensajeColaDispositivo msj;
+    //MENSAJE_ERROR( "Esperando mensaje DESPACHO_FINALIZADO en disp %d", m_Id ); //<DBG>
     int codError = msgrcv( m_Cola, &msj, sizeof(msj)-sizeof(long),
                        Robots2::TipoMensajes::MensajeColaDispositivo( m_Id ), 0 );
     if( codError == -1 ){
@@ -122,7 +129,7 @@ int Dispositivo::EsperarDespacho(){
         exit( 5 );
     }
     if( msj.Msg != Robots2::MensajesDispositivo::DESPACHO_FINALIZADO ){
-        MENSAJE_ERROR( "Se esperaba un mensaje de Despacho finalizado pero llego otro" );
+        MENSAJE_ERROR( "Se esperaba un mensaje de Despacho finalizado pero llego otro (%d)", msj.Msg );
         exit( 5 );
     }
     return msj.DatosMsg;
@@ -134,6 +141,7 @@ void Dispositivo::Despachar( int idRobot ){
         Robots2::MensajesDispositivo::DESPACHO_FINALIZADO,     //Msg
         idRobot                                                //DatosMsg
     };
+    //MENSAJE_ERROR( "Enviando DESPACHO_FINALIZADO de robo %d a disp %d", idRobot, m_Id ); //<DBG>
     int codError = msgsnd( m_Cola, &msj, sizeof(msj)-sizeof(long), 0 );
     if( codError == -1 ){
         MENSAJE_ERROR( "Error al enviar DESPACHO_FINALIZADO " );
@@ -144,6 +152,7 @@ void Dispositivo::Despachar( int idRobot ){
 int Dispositivo::EsperarEmpaque(){
     //Esperar mensaje de fin de empaque
     Robots2::MensajeColaDispositivo msj;
+    //MENSAJE_ERROR( "Esperando mensaje EMPAQUE_FINALIZADO en disp %d", m_Id ); //<DBG>
     int codError = msgrcv( m_Cola, &msj, sizeof(msj)-sizeof(long),
                            Robots2::TipoMensajes::MensajeColaDispositivo( m_Id ), 0 );
     if( codError == -1 ){
@@ -163,6 +172,7 @@ void Dispositivo::Empacar( int idRobot ){
         Robots2::MensajesDispositivo::EMPAQUE_FINALIZADO,      //Msg
         idRobot                                                //DatosMsg
     };
+    //MENSAJE_ERROR( "Enviando EMPAQUE_FINALIZADO de robo %d a disp %d", idRobot, m_Id ); //<DBG>
     int codError = msgsnd( m_Cola, &msj, sizeof(msj)-sizeof(long), 0 );
     if( codError == -1 ){
         MENSAJE_ERROR( "Error al enviar EMPAQUE_FINALIZADO " );
